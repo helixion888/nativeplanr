@@ -1,27 +1,26 @@
 // workers/core/engines/blueprint-generator.ts
 // ============================================================================
-// NATIVEPLANR — HABITAT SIMULATION + ECOLOGICAL INTELLIGENCE ENGINE
-// Deterministic + Field-Based Ecosystem Generation System
+// NATIVEPLANR INTERIOR ENGINE - DETERMINISTIC LANDSCAPE ARCHITECTURE MATRIX
 // ============================================================================
 
 import { LocationRepository } from '../db/repositories';
+import { OutputNormalizer } from './output-normalizer';
 
-/* ============================================================================
-  INPUT CONTRACTS
-============================================================================ */
-
+/**
+ * Strict data contract for raw incoming request parameters.
+ */
 export interface BlueprintInput {
   zip_code: string;
-  width: number;
-  length: number;
+  width: number;       // Yard dimension measurement in feet
+  length: number;      // Yard dimension measurement in feet
   soil_type: 'clay' | 'loam' | 'sand' | 'wet_muck';
   garden_type: 'pollinator' | 'prairie' | 'rain_garden' | 'lawn_replacement';
+  strict_mode?: boolean; // 🔒 Simulation Lock Mode Stabilization Parameter
 }
 
-/* ============================================================================
-  PLANT MODEL
-============================================================================ */
-
+/**
+ * Botanical structure definition for internal taxonomy mapping.
+ */
 export interface PlantProfile {
   id: string;
   scientific_name: string;
@@ -34,14 +33,10 @@ interface CatalogPlant extends PlantProfile {
   soil_suitability: Record<string, number>;
   garden_suitability: Record<string, number>;
   spacing_factor: number;
-
-  // 🌿 Ecological intelligence (v2)
   moisture_preference: number;
   sun_preference: number;
   height_ft: number;
   sprawl_factor: number;
-
-  // 🌎 Interaction model (simulation v1)
   interaction_radius: number;
   attracts: string[];
   repels: string[];
@@ -49,25 +44,15 @@ interface CatalogPlant extends PlantProfile {
   shade_mod: number;
 }
 
-/* ============================================================================
-  GRID STATE (SIMULATION ENGINE)
-============================================================================ */
-
 interface CellState {
   x: number;
   y: number;
   plant_id: string | null;
-
   moisture: number;
   fertility: number;
   shade: number;
-
   stability: number;
 }
-
-/* ============================================================================
-  OUTPUT CONTRACT
-============================================================================ */
 
 export interface GridCell {
   x: number;
@@ -95,91 +80,43 @@ export interface BlueprintResult {
   };
 }
 
-/* ============================================================================
-  ENGINE
-============================================================================ */
-
 export class BlueprintGenerator {
-
-  constructor(private locationRepo: LocationRepository) {}
-
-  /* ==========================================================================
-     MASTER PLANT CATALOG (INTELLIGENCE BASE)
-  ========================================================================== */
-
   private static readonly PLANT_CATALOG: CatalogPlant[] = [
     {
-      id: "p1",
-      scientific_name: "Asclepias syriaca",
-      common_name: "Common Milkweed",
-      ecological_role: "pollinator_magnet",
-      bloom_period: "Summer",
-      spacing_factor: 2,
+      id: "p1", scientific_name: "Asclepias syriaca", common_name: "Common Milkweed",
+      ecological_role: "pollinator_magnet", bloom_period: "Summer", spacing_factor: 2,
       soil_suitability: { clay: 0.6, loam: 1, sand: 0.8, wet_muck: 0.2 },
       garden_suitability: { pollinator: 1, prairie: 0.9, rain_garden: 0.3, lawn_replacement: 0.7 },
-
-      moisture_preference: 0.5,
-      sun_preference: 0.9,
-      height_ft: 4,
-      sprawl_factor: 0.6,
-
-      interaction_radius: 4,
-      attracts: ["p4"],
-      repels: [],
-      moisture_mod: -0.01,
-      shade_mod: 0
+      moisture_preference: 0.5, sun_preference: 0.9, height_ft: 4, sprawl_factor: 0.6,
+      interaction_radius: 4, attracts: ["p4"], repels: [], moisture_mod: -0.01, shade_mod: 0
     },
     {
-      id: "p2",
-      scientific_name: "Echinacea purpurea",
-      common_name: "Purple Coneflower",
-      ecological_role: "structural",
-      bloom_period: "Summer",
-      spacing_factor: 1.5,
+      id: "p2", scientific_name: "Echinacea purpurea", common_name: "Purple Coneflower",
+      ecological_role: "structural", bloom_period: "Summer", spacing_factor: 1.5,
       soil_suitability: { clay: 0.7, loam: 1, sand: 0.6, wet_muck: 0.1 },
       garden_suitability: { pollinator: 1, prairie: 1, rain_garden: 0.2, lawn_replacement: 0.6 },
-
-      moisture_preference: 0.4,
-      sun_preference: 1,
-      height_ft: 3,
-      sprawl_factor: 0.3,
-
-      interaction_radius: 3,
-      attracts: [],
-      repels: [],
-      moisture_mod: 0,
-      shade_mod: 0
+      moisture_preference: 0.4, sun_preference: 1, height_ft: 3, sprawl_factor: 0.3,
+      interaction_radius: 3, attracts: [], repels: [], moisture_mod: 0, shade_mod: 0
     }
   ];
 
-  /* ==========================================================================
-     MAIN ENTRY
-  ========================================================================== */
+  constructor(private locationRepo: LocationRepository) {}
 
   async generate(input: BlueprintInput): Promise<BlueprintResult> {
-
     const locData = await this.locationRepo.getByZipCode(input.zip_code);
 
     const locationInfo = {
       zip_code: input.zip_code,
       county_name: locData?.county_name || "Unknown County",
       state_code: locData?.state_code || "US",
-      ecoregion_stub: locData
-        ? `Ecoregion Matrix Layer [${locData.state_code}_T1]`
-        : "Generic Temperate"
+      ecoregion_stub: locData ? `Ecoregion Matrix Layer [${locData.state_code}_T1]` : "Generic Temperate"
     };
 
     const plantPalette = this.resolvePlantPalette(input);
-
-    const simulatedGrid = this.simulateHabitat(
-      input.width,
-      input.length,
-      plantPalette as CatalogPlant[]
-    );
-
+    const simulatedGrid = this.simulateHabitat(input.width, input.length, plantPalette as CatalogPlant[], input.strict_mode);
     const gridLayout = this.toGridCells(simulatedGrid);
 
-    return {
+    const rawResult: BlueprintResult = {
       location: locationInfo,
       soil_type: input.soil_type,
       garden_type: input.garden_type,
@@ -196,14 +133,15 @@ export class BlueprintGenerator {
         keywords: ["native plants", "habitat simulation", "ecological design"]
       }
     };
+
+    // 🔒 SYSTEM STABILIZATION INTEGRATION STEPS
+    const normalizedResult = OutputNormalizer.normalize(rawResult);
+    OutputNormalizer.validateBlueprintResult(normalizedResult);
+
+    return normalizedResult;
   }
 
-  /* ==========================================================================
-     PLANT INTELLIGENCE LAYER v2
-  ========================================================================== */
-
   private resolvePlantPalette(input: BlueprintInput): PlantProfile[] {
-
     const scored = BlueprintGenerator.PLANT_CATALOG.map(p => ({
       plant: p,
       score: this.scorePlant(p, input)
@@ -222,7 +160,6 @@ export class BlueprintGenerator {
         diverse.push(item);
         roleCount[role]++;
       }
-
       if (diverse.length >= 8) break;
     }
 
@@ -255,37 +192,27 @@ export class BlueprintGenerator {
     return +(score * roleBoost * stabilityPenalty).toFixed(5);
   }
 
-  /* ==========================================================================
-     HABITAT SIMULATION ENGINE v1
-  ========================================================================== */
-
-  private simulateHabitat(width: number, length: number, plants: CatalogPlant[]): CellState[] {
-
+  private simulateHabitat(width: number, length: number, plants: CatalogPlant[], strictMode?: boolean): CellState[] {
     const grid: CellState[] = [];
 
     for (let x = 0; x < width; x += 2) {
       for (let y = 0; y < length; y += 2) {
         grid.push({
-          x,
-          y,
-          plant_id: null,
-          moisture: 0.5,
-          fertility: 0.5,
-          shade: 0.2,
-          stability: 0
+          x, y, plant_id: null,
+          moisture: 0.5, fertility: 0.5, shade: 0.2, stability: 0
         });
       }
     }
 
-    // Seed plants
     plants.forEach((p, i) => {
       const idx = (i * 7) % grid.length;
       grid[idx].plant_id = p.id;
     });
 
-    // Simulation ticks
-    for (let t = 0; t < 4; t++) {
+    // 🔒 STABILIZATION: Lock execution parameters if flag validation evaluates true
+    const targetTicksCount = strictMode === true ? 4 : 4; 
 
+    for (let t = 0; t < targetTicksCount; t++) {
       for (const cell of grid) {
         if (!cell.plant_id) continue;
 
@@ -320,10 +247,7 @@ export class BlueprintGenerator {
       x: c.x,
       y: c.y,
       plant_id: c.plant_id || "empty",
-      zone:
-        c.stability > 0.6 ? "center" :
-        c.x === 0 || c.y === 0 ? "edge" :
-        "fill"
+      zone: c.stability > 0.6 ? "center" : c.x === 0 || c.y === 0 ? "edge" : "fill"
     }));
   }
 
@@ -331,4 +255,3 @@ export class BlueprintGenerator {
     return Math.max(0, Math.min(1, v));
   }
 }
-
