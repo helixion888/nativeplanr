@@ -255,3 +255,4 @@ export class BlueprintGenerator {
     return Math.max(0, Math.min(1, v));
   }
 }
+
