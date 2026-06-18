@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NativePlanr — Habitat Simulation Generator</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-container">
+      <h1 class="logo-text">NativePlanr</h1>
+      <span class="badge">Ecosystem Simulator v1.0</span>
+    </div>
+  </header>
+
+  <main class="app-viewport">
+    <section class="workspace-panel" id="input-pane"></section>
+
+    <section class="canvas-panel">
+      <div class="canvas-wrapper">
+        <h2 class="section-title">Ecosystem Simulation Canvas</h2>
+        <div id="loading-overlay" class="hidden">Simulating Habitat Ecology...</div>
+        <div id="grid-canvas"></div>
+      </div>
+    </section>
+
+    <section class="sidebar-panel">
+      <div id="legend-pane"></div>
+      <div id="metadata-pane" class="metadata-wrapper hidden">
+        <h3 class="panel-subtitle">Ecological Insights</h3>
+        <div id="seasonal-notes-list"></div>
+        <hr class="divider" />
+        <h3 class="panel-subtitle">SEO Target Context</h3>
+        <div id="seo-tags-box"></div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
