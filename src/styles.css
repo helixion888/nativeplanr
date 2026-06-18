@@ -1,0 +1,73 @@
+/* src/styles.css */
+:root {
+  --canvas-bg: #f5f5f4;     /* Stone 100 (Calm Natural Linen) */
+  --panel-bg: #ffffff;      /* Pure White Surface Modules */
+  --border-color: #e7e5e4;  /* Stone 200 Structural Rules */
+  --text-primary: #1c1917;  /* Stone 900 Charcoal Text */
+  --text-muted: #57534e;    /* Stone 600 Branch Grey */
+  --brand-accent: #166534;  /* Green 800 Deep Forest Flora Accent */
+  
+  /* Ecological Zone Theme Token Mapping */
+  --zone-edge: #d6d3d1;     /* Stone 300 Buffer Zone */
+  --zone-center: #bbf7d0;   /* Green 200 Pollinator Hotspot Core */
+  --zone-fill: #e2e8f0;     /* Slate 200 Groundcover Matting */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--canvas-bg);
+  color: var(--text-primary);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-header {
+  background-color: var(--panel-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 2rem;
+}
+.header-container { display: flex; align-items: center; gap: 1rem; }
+.logo-text { font-family: 'Playfair Display', Georgia, serif; font-size: 1.5rem; color: var(--brand-accent); }
+.badge { font-size: 0.75rem; font-weight: 600; background: #f0fdf4; color: var(--brand-accent); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid #bbf7d0; }
+
+.app-viewport { display: flex; flex: 1; overflow: hidden; }
+.workspace-panel { width: 320px; background: var(--panel-bg); border-right: 1px solid var(--border-color); padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; overflow-y: auto; }
+.canvas-panel { flex: 1; padding: 2rem; display: flex; justify-content: center; align-items: center; overflow: auto; }
+.sidebar-panel { width: 360px; background: var(--panel-bg); border-left: 1px solid var(--border-color); padding: 2rem; display: flex; flex-direction: column; gap: 2rem; overflow-y: auto; }
+
+.section-title { font-family: 'Playfair Display', Georgia, serif; font-size: 1.25rem; margin-bottom: 1.5rem; }
+.panel-subtitle { font-size: 0.87rem; font-weight: 600; text-transform: uppercase; tracking: 0.05em; color: var(--text-muted); margin-bottom: 0.75rem; }
+
+/* Control Form Styling */
+.form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.form-group label { font-size: 0.85rem; font-weight: 500; color: var(--text-muted); }
+.form-group input, .form-group select { padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; font-family: inherit; width: 100%; }
+.form-group input:focus, .form-group select:focus { outline: 2px solid var(--brand-accent); }
+.btn-primary { background: var(--brand-accent); color: white; padding: 0.75rem; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; font-family: inherit; margin-top: 1rem; }
+.btn-primary:hover { opacity: 0.9; }
+
+/* Canvas Grid Engine Layouts */
+.canvas-wrapper { width: 100%; max-width: 600px; display: flex; flex-direction: column; position: relative; }
+#grid-canvas { display: grid; gap: 4px; width: 100%; background: #e7e5e4; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); aspect-ratio: 1; }
+.grid-cell { border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 0.65rem; font-weight: 600; aspect-ratio: 1; transition: transform 0.15s ease; border: 1px solid rgba(0,0,0,0.05); }
+.grid-cell:hover { transform: scale(1.08); z-index: 10; cursor: pointer; }
+
+/* Ecological Zone Presentation States */
+.cell-zone-edge { background-color: var(--zone-edge); color: #44403c; }
+.cell-zone-center { background-color: var(--zone-center); color: #166534; }
+.cell-zone-fill { background-color: var(--zone-fill); color: #1e293b; }
+
+/* Components Styling */
+.legend-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border-color); }
+.legend-color-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.plant-names { display: flex; flex-direction: column; }
+.plant-common { font-size: 0.9rem; font-weight: 500; }
+.plant-scientific { font-size: 0.75rem; font-style: italic; color: var(--text-muted); }
+.note-card { font-size: 0.85rem; line-height: 1.5; color: var(--text-muted); padding: 0.75rem; background: #fafaf9; border-left: 3px solid var(--brand-accent); margin-bottom: 0.5rem; border-radius: 0 4px 4px 0; }
+.seo-tag { display: inline-block; font-size: 0.75rem; background: #f1f5f9; color: #475569; padding: 0.25rem 0.5rem; border-radius: 4px; margin: 0.25rem; border: 1px solid #cbd5e1; }
+.divider { border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0; }
+.hidden { display: none !important; }
+#loading-overlay { position: absolute; inset: 0; background: rgba(245,245,244,0.85); display: flex; justify-content: center; align-items: center; font-weight: 600; color: var(--brand-accent); z-index: 20; border-radius: 8px; }
