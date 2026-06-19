@@ -1,0 +1,24 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "nativeplanr-api"
+main = "workers/api/worker.ts"
+compatibility_date = "2026-06-19"
+
+# 1. Serverless Edge Gateway Environment Variables
+[vars]
+ENVIRONMENT = "production"
+SCHEMA_VERSION = "1.0.0"
+
+# 2. Relational Storage Binding Vector (D1)
+[[d1_databases]]
+binding = "DB"
+database_name = "nativeplanr-prod-db"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+# 3. Ecological Knowledge Graph State Mapping Cache (KV)
+[[kv_namespaces]]
+binding = "KNOWLEDGE_GRAPH_CACHE"
+id = "00000000000000000000000000000000"
+
+# 4. Global Production Edge Route Allocations
+[compatibility_flags]
+modules_spec_compliant = true
