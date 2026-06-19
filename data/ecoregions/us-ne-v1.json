@@ -1,0 +1,11 @@
+{
+  "ecoregion_id": "US_NE_T1",
+  "geographical_bounds": {
+    "states": ["MI", "OH", "IN", "IL", "WI", "PA", "NY"],
+    "koppen_climate": "Dfb"
+  },
+  "default_baselines": {
+    "average_frost_free_days": 145,
+    "native_organic_matter_pct": 4.5
+  }
+}
