@@ -1,0 +1,49 @@
+{
+  "$schema": "https://nativeplanr.com/schemas/v1/plants.schema.json",
+  "ecoregion_version": "us-ne-v1.0.0",
+  "last_updated": 1779120000,
+  "plants": [
+    {
+      "id": "p1",
+      "scientific_name": "Asclepias syriaca",
+      "common_name": "Common Milkweed",
+      "ecological_role": "pollinator_magnet",
+      "bloom_period": "Summer",
+      "spacing_factor": 2.0,
+      "height_ft": 4.0,
+      "sprawl_factor": 0.6,
+      "sun_preference": 0.9,
+      "moisture_preference": 0.5,
+      "soil_affinity": { "clay": 0.6, "loam": 1.0, "sand": 0.8, "wet_muck": 0.2 },
+      "garden_affinity": { "pollinator": 1.0, "prairie": 0.9, "rain_garden": 0.3, "lawn_replacement": 0.7 }
+    },
+    {
+      "id": "p2",
+      "scientific_name": "Echinacea purpurea",
+      "common_name": "Purple Coneflower",
+      "ecological_role": "structural",
+      "bloom_period": "Summer",
+      "spacing_factor": 1.5,
+      "height_ft": 3.0,
+      "sprawl_factor": 0.3,
+      "sun_preference": 1.0,
+      "moisture_preference": 0.4,
+      "soil_affinity": { "clay": 0.7, "loam": 1.0, "sand": 0.6, "wet_muck": 0.1 },
+      "garden_affinity": { "pollinator": 1.0, "prairie": 1.0, "rain_garden: " : 0.2, "lawn_replacement": 0.6 }
+    },
+    {
+      "id": "p3",
+      "scientific_name": "Carex pensylvanica",
+      "common_name": "Pennsylvania Sedge",
+      "ecological_role": "groundcover",
+      "bloom_period": "Spring",
+      "spacing_factor": 1.0,
+      "height_ft": 1.0,
+      "sprawl_factor": 0.8,
+      "sun_preference": 0.3,
+      "moisture_preference": 0.4,
+      "soil_affinity": { "clay": 0.5, "loam": 1.0, "sand": 0.9, "wet_muck": 0.2 },
+      "garden_affinity": { "pollinator": 0.4, "prairie": 0.6, "rain_garden": 0.4, "lawn_replacement": 1.0 }
+    }
+  ]
+}
