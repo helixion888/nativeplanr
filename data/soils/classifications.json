@@ -1,0 +1,8 @@
+{
+  "classifications": {
+    "clay": { "drainage_coefficient": 0.2, "nutrient_retention": 0.9, "base_stability": 0.8 },
+    "loam": { "drainage_coefficient": 0.6, "nutrient_retention": 0.7, "base_stability": 0.6 },
+    "sand": { "drainage_coefficient": 1.0, "nutrient_retention": 0.2, "base_stability": 0.3 },
+    "wet_muck": { "drainage_coefficient": 0.1, "nutrient_retention": 0.8, "base_stability": 0.2 }
+  }
+}
