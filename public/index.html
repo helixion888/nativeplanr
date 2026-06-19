@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NativePlanr MVP — Habitat Layout Canvas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-navbar">
+    <div class="brand-shell">
+      <h1 class="logo-text">NativePlanr</h1>
+      <span class="version-tag">MVP Application Shell</span>
+    </div>
+  </header>
+
+  <main class="viewport-workspace">
+    <section class="control-sidebar">
+      <h2 class="panel-headline">Plot Parameters</h2>
+      <form id="garden-input-form" class="parameter-form">
+        <div class="control-group">
+          <label for="plot-width">Plot Width (Feet)</label>
+          <input type="number" id="plot-width" name="width" value="12" min="4" max="100" required>
+        </div>
+        
+        <div class="control-group">
+          <label for="plot-length">Plot Length (Feet)</label>
+          <input type="number" id="plot-length" name="length" value="12" min="4" max="100" required>
+        </div>
+
+        <div class="control-group">
+          <label for="soil-type">Soil Classification</label>
+          <select id="soil-type" name="soil_type" required>
+            <option value="loam">Rich Loam Topsoil</option>
+            <option value="clay">Heavy Structural Clay</option>
+            <option value="sand">Coarse Well-Drained Sand</option>
+            <option value="wet_muck">Hydric High-Organic Muck</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="garden-type">System Target Niche</label>
+          <select id="garden-type" name="garden_type" required>
+            <option value="pollinator">Lepidoptera Pollinator Ribbon</option>
+            <option value="prairie">Oak Opening Grassland Prairie</option>
+            <option value="rain_garden">Hydrological Infiltration Rain Basin</option>
+            <option value="lawn_replacement">Biodiverse Living Mulch Turf</option>
+          </select>
+        </div>
+
+        <button type="submit" id="submit-btn" class="action-button">Simulate System Layout</button>
+      </form>
+    </section>
+
+    <section class="canvas-viewport">
+      <div class="canvas-container">
+        <h2 class="panel-headline">Visual Spatial Matrix Grid</h2>
+        <div id="ui-loading-indicator" class="loading-shroud hidden">Computing Edge Layout Vector...</div>
+        <div id="render-target-canvas">
+          <div class="canvas-placeholder-text">Configure constraints and select simulate to initialize layout grid.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
