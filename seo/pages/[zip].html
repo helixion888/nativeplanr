@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{SEO_TITLE}}</title>
+  <meta name="description" content="{{SEO_DESCRIPTION}}">
+  <meta name="keywords" content="{{SEO_KEYWORDS}}">
+  <link rel="canonical" href="https://nativeplanr.com/directory/zip/{{ZIP_CODE}}">
+  <style>
+    :root { --canvas-bg: #f5f5f4; --text-primary: #1c1917; --text-muted: #57534e; --brand-accent: #166534; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--canvas-bg); color: var(--text-primary); line-height: 1.6; margin: 0; padding: 2rem; }
+    .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 2.5rem; border-radius: 8px; border: 1px solid #e7e5e4; }
+    h1 { font-family: Georgia, serif; color: var(--brand-accent); font-size: 2.25rem; margin-bottom: 0.5rem; }
+    .subtitle { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem; }
+    .grid-matrix { display: grid; gap: 4px; background: #e7e5e4; padding: 8px; border-radius: 6px; aspect-ratio: 1; margin: 2rem 0; }
+    .cell { background: #e2e8f0; border-radius: 2px; display: flex; justify-content: center; align-items: center; font-size: 0.7rem; font-weight: bold; aspect-ratio: 1; }
+    .cell-edge { background: #d6d3d1; }
+    .cell-center { background: #bbf7d0; color: #166534; }
+    .plant-list, .notes-section { margin-top: 2.5rem; }
+    .plant-item { padding: 0.75rem 0; border-bottom: 1px solid #e7e5e4; }
+    .internal-links { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #e7e5e4; font-size: 0.9rem; }
+    .internal-links a { color: var(--brand-accent); margin-right: 1rem; text-decoration: none; font-weight: 500; }
+    .internal-links a:hover { text-decoration: underline; }
+  </style>
+  {{SEO_SCHEMA_JSON_LD}}
+</head>
+<body>
+  <article class="container">
+    <header>
+      <nav><a href="/directory" style="color:var(--brand-accent); text-decoration:none; font-size:0.9rem;">← Back to Ecoregion Directory</a></nav>
+      <h1>{{GARDEN_TYPE}} Design Plan for ZIP {{ZIP_CODE}}</h1>
+      <p class="subtitle">An ecological landscape blueprint optimized for {{SOIL_TYPE}} soil in {{COUNTY_NAME}}, {{STATE_CODE}}.</p>
+    </header>
+
+    <section class="grid-section">
+      <h2>Simulated Spatial Planting Matrix</h2>
+      <p style="font-size:0.9rem; color:var(--text-muted);">This 2-foot grid model displays optimal species placement patterns calculated for native habitat stability.</p>
+      <div class="grid-matrix" style="grid-template-columns: repeat({{GRID_COLUMNS}}, 1fr);">
+        {{GRID_CELLS_HTML}}
+      </div>
+    </section>
+
+    <section class="plant-list">
+      <h2>Recommended Native Taxonomy Species Palette</h2>
+      <div>{{PLANT_LIST_HTML}}</div>
+    </section>
+
+    <section class="notes-section">
+      <h2>Ecosystem Management Schedules</h2>
+      <div>{{SEASONAL_NOTES_HTML}}</div>
+    </section>
+
+    <footer class="internal-links">
+      <strong>Regional Native Guides:</strong>
+      <a href="/directory/county/{{COUNTY_URL}}">Native Habitat Plans for {{COUNTY_NAME}}</a>
+      <a href="/directory/state/{{STATE_CODE}}">{{STATE_CODE}} Native Flora Index</a>
+    </footer>
+  </article>
+</body>
+</html>
