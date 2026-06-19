@@ -12,7 +12,7 @@ class MvpApplicationController {
     this.loadingIndicator = document.getElementById('ui-loading-indicator');
     this.submitButton = document.getElementById('submit-btn');
     
-    this.apiTargetRoute = '/api/import'; // Connects cleanly into Module 9 routing parameters
+    this.apiTargetRoute = 'https://nativeplanr-api.helixion.workers.dev/api/import'; // Connects cleanly into Module 9 routing parameters
   }
 
   initialize() {
