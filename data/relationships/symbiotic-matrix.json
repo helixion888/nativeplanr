@@ -1,0 +1,22 @@
+{
+  "$schema": "https://nativeplanr.com/schemas/v1/relationships.schema.json",
+  "matrix_version": "rel-v1.0.0",
+  "interactions": [
+    {
+      "source_plant_id": "p1",
+      "interaction_radius_ft": 4,
+      "moisture_modifier": -0.01,
+      "shade_modifier": 0.0,
+      "attracts_fauna": ["Danaus plexippus", "Bombus pensylvanicus"],
+      "companion_plant_ids": ["p2", "p4"]
+    },
+    {
+      "source_plant_id": "p2",
+      "interaction_radius_ft": 3,
+      "moisture_modifier": 0.0,
+      "shade_modifier": 0.0,
+      "attracts_fauna": ["Melissodes bimaculatus", "Spizella passerina"],
+      "companion_plant_ids": ["p1", "p3"]
+    }
+  ]
+}
