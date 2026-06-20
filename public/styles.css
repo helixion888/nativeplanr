@@ -55,3 +55,120 @@ body {
 
 .loading-shroud { position: absolute; inset: 0; background: rgba(250,250,249,0.85); display: flex; justify-content: center; align-items: center; font-weight: 600; color: var(--color-action-green); z-index: 100; font-size: 0.95rem; border-radius: 8px; }
 .hidden { display: none !important; }
+
+/* Simulation Layout Styles */
+.simulation-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.matrix-metadata-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #a0aec0;
+  border-bottom: 1px solid #2d3748;
+  padding-bottom: 0.75rem;
+}
+
+.meta-badge {
+  background-color: #1c3d27;
+  color: #48bb78;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  text-transform: uppercase;
+}
+
+/* Legend Styling */
+.zone-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: #1a202c;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid #2d3748;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* CSS Grid Engine */
+.spatial-grid-matrix {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols, 12), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--grid-rows, 12), minmax(0, 1fr));
+  gap: 4px;
+  background: #11141a;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #2d3748;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 1 / 1; /* Keeps grid square across device sizes */
+  box-sizing: border-box;
+}
+
+/* Ecological Zone Color Matrix */
+.matrix-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  font-weight: bold;
+  transition: transform 0.15s ease;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.matrix-tile:hover {
+  transform: scale(1.05);
+  z-index: 2;
+}
+
+.zone-edge { background-color: #2c5282; color: #ebf8ff; border: 1px solid #4299e1; }
+.zone-center { background-color: #276749; color: #f0fff4; border: 1px solid #48bb78; }
+.zone-fill { background-color: #b7791f; color: #fffaf0; border: 1px solid #ecc94b; }
+.zone-open { background-color: #1a202c; color: #4a5568; border: 1px dashed #2d3748; }
+
+/* Micro-typography for tiles */
+.tile-label {
+  font-size: clamp(0.5rem, 1.5vw, 0.75rem);
+  letter-spacing: 0.05em;
+}
+.tile-label-empty {
+  font-size: 1.2rem;
+}
+
+/* Error States */
+.canvas-error-state {
+  border: 1px dashed #e53e3e;
+  background: #2d1a1a;
+  color: #fed7d7;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
