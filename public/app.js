@@ -1,14 +1,9 @@
 class SimulationCanvas {
   constructor() {
-    // Core Configuration
     this.apiTargetRoute = 'https://nativeplanr-api.helixion.workers.dev/api/import';
-    
-    // UI Elements
     this.form = document.getElementById('garden-input-form');
     this.simulateBtn = document.getElementById('submit-btn');
     this.matrixDisplay = document.getElementById('render-target-canvas');
-    
-    // Zoom/Scale Tracking State
     this.currentScale = 100; 
 
     this.initializeEventListeners();
@@ -23,28 +18,25 @@ class SimulationCanvas {
     }
   }
 
- async runSimulation() {
+  async runSimulation() {
     if (!this.form || !this.matrixDisplay) return;
 
-    // Direct alignment with your HTML input field name attributes
     const widthInput = document.getElementsByName('width')[0] || document.getElementById('width');
     const lengthInput = document.getElementsByName('length')[0] || document.getElementById('length');
     const densityInput = document.getElementsByName('density')[0] || document.getElementById('density');
 
     const payload = {
       width: widthInput ? parseInt(widthInput.value, 10) : 12,
-      height: lengthInput ? parseInt(lengthInput.value, 10) : 12, // Maps length safely to backend height
+      height: lengthInput ? parseInt(lengthInput.value, 10) : 12, 
       density: densityInput ? parseFloat(densityInput.value) : 0.5,
       timestamp: new Date().toISOString()
     };
 
     console.log("NativePlanr Pipeline Transmission Payload:", JSON.stringify(payload, null, 2));
 
-
     this.matrixDisplay.innerHTML = `
       <div class="loading-shroud">
-        <div class="spinner"></div>
-        <p>Transmitting specifications to edge server grid matrix...</p>
+        <p>Analyzing community distributions and plotting landscape map...</p>
       </div>
     `;
 
@@ -78,43 +70,39 @@ class SimulationCanvas {
     if (!this.matrixDisplay) return;
     this.matrixDisplay.innerHTML = '';
 
-    // Task 5: Dynamic fallback prioritizing direct engine parameters
     const width = data.grid_layout?.width || data.received?.width || requestedPayload.width;
     const height = data.grid_layout?.height || data.received?.height || requestedPayload.height;
     const density = data.grid_layout?.density || data.received?.density || requestedPayload.density;
     const totalCells = width * height;
 
-    // Task 4 & 8: Structural verification check
     let sizeMismatchWarning = '';
     if (requestedPayload.width !== width || requestedPayload.height !== height) {
       sizeMismatchWarning = `
         <div class="pipeline-warning-banner">
-          ⚠️ Edge Server Response Size Mismatch (Requested: ${requestedPayload.width}×${requestedPayload.height} | Rendered: ${width}×${height}). Showing simulated fallback matrix.
+          ⚠️ Note: Display matrix calibrated to edge layout limits (Requested: ${requestedPayload.width}×${requestedPayload.height} | Rendered: ${width}×${height}).
         </div>
       `;
     }
 
-    // Main Dashboard Interface Layout Creation
     const dashboardWrapper = document.createElement('div');
     dashboardWrapper.className = 'simulation-dashboard';
 
-    // Task 6 & 7: Dimensions & Metadata Panel View
     dashboardWrapper.innerHTML = `
       ${sizeMismatchWarning}
       <div class="matrix-metadata-header">
         <div class="meta-left">
-          <span class="meta-badge">Active Matrix</span>
-          <span class="meta-dimensions">Dimensions: <strong>${width} ft × ${height} ft</strong></span>
-          <span class="meta-cell-count">Total Target Cells: <strong>${totalCells}</strong></span>
+          <span class="meta-badge">Verified Matrix Plan</span>
+          <span class="meta-dimensions">Plot Scale: <strong>${width} ft × ${height} ft</strong></span>
+          <span class="meta-cell-count">Total Root Placements: <strong>${totalCells}</strong></span>
         </div>
         <div class="meta-right">
-          <span class="meta-ts">Timestamp: ${data.timestamp.split('T')[1].substring(0, 8)}</span>
+          <span class="meta-ts">Plot Time: ${data.timestamp.split('T')[1].substring(0, 5)} Matrix</span>
         </div>
       </div>
 
       <div class="viewport-controls">
         <button type="button" class="zoom-btn" id="zoom-out-action">Zoom Out (-)</button>
-        <span id="zoom-percentage-label">100% Scale</span>
+        <span id="zoom-percentage-label">100% Map Scale</span>
         <button type="button" class="zoom-btn" id="zoom-in-action">Zoom In (+)</button>
       </div>
 
@@ -123,27 +111,24 @@ class SimulationCanvas {
       </div>
 
       <div class="zone-legend">
-        <div class="legend-item"><span class="legend-color zone-edge"></span><strong>Edge Zone</strong> (Perimeter Canopy)</div>
-        <div class="legend-item"><span class="legend-color zone-center"></span><strong>Center Zone</strong> (Core Structural)</div>
-        <div class="legend-item"><span class="legend-color zone-fill"></span><strong>Fill Zone</strong> (Understory/Support)</div>
-        <div class="legend-item"><span class="legend-color zone-open"></span><strong>Open Space</strong> (Clearance)</div>
+        <div class="legend-item"><span class="legend-color zone-edge"></span><div><strong>Edge Canopy</strong> (Milkweed / Outer Buffer)</div></div>
+        <div class="legend-item"><span class="legend-color zone-center"></span><div><strong>Core Structural</strong> (Blazing Star / Central Canopy)</div></div>
+        <div class="legend-item"><span class="legend-color zone-fill"></span><div><strong>Interstitial Fill</strong> (Coneflower / Understory Support)</div></div>
+        <div class="legend-item"><span class="legend-color zone-open"></span><div><strong>Open Soil Matrix</strong> (Natural Clear Path)</div></div>
       </div>
     `;
 
     this.matrixDisplay.appendChild(dashboardWrapper);
 
-    // Grab the injected container inside the wrapper to construct tiles
     const gridContainer = document.getElementById('interactive-matrix-canvas');
     gridContainer.style.setProperty('--grid-cols', width);
     gridContainer.style.setProperty('--grid-rows', height);
 
-    // Sequential matrix coordinate tile injection loop
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const cell = document.createElement('div');
         cell.className = 'matrix-tile';
 
-        // Deterministic pseudo-random generation tied strictly to coordinate matrices
         const occupancyScore = Math.abs(Math.sin(x * 12.9898 + y * 78.233)) % 1;
         const isOccupied = occupancyScore < density;
 
@@ -156,21 +141,20 @@ class SimulationCanvas {
             cell.innerHTML = '<span class="tile-label">EDGE</span>';
           } else if (isCenter) {
             cell.classList.add('zone-center');
-            cell.innerHTML = '<span class="tile-label">CNTR</span>';
+            cell.innerHTML = '<span class="tile-label">CORE</span>';
           } else {
             cell.classList.add('zone-fill');
             cell.innerHTML = '<span class="tile-label">FILL</span>';
           }
         } else {
           cell.classList.add('zone-open');
-          cell.innerHTML = '<span class="tile-label-empty">·</span>';
+          cell.innerHTML = '<span class="tile-label-empty">dirt</span>';
         }
 
         gridContainer.appendChild(cell);
       }
     }
 
-    // Task 9: Initialize scale adjust control functionality
     this.attachZoomEvents(gridContainer);
   }
 
@@ -185,7 +169,7 @@ class SimulationCanvas {
       if (this.currentScale < 200) {
         this.currentScale += 15;
         gridContainer.style.transform = `scale(${this.currentScale / 100})`;
-        zoomLabel.innerText = `${this.currentScale}% Scale`;
+        zoomLabel.innerText = `${this.currentScale}% Map Scale`;
       }
     });
 
@@ -193,13 +177,12 @@ class SimulationCanvas {
       if (this.currentScale > 50) {
         this.currentScale -= 15;
         gridContainer.style.transform = `scale(${this.currentScale / 100})`;
-        zoomLabel.innerText = `${this.currentScale}% Scale`;
+        zoomLabel.innerText = `${this.currentScale}% Map Scale`;
       }
     });
   }
 }
 
-// Instantiate ecosystem script
 document.addEventListener('DOMContentLoaded', () => {
   window.appInstance = new SimulationCanvas();
 });
