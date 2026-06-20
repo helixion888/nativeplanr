@@ -23,23 +23,23 @@ class SimulationCanvas {
     }
   }
 
-  async runSimulation() {
+ async runSimulation() {
     if (!this.form || !this.matrixDisplay) return;
 
-    // Task 1 & 2: Explicitly parse and verify structural constraints from form fields
+    // Direct alignment with your HTML input field name attributes
     const widthInput = document.getElementsByName('width')[0] || document.getElementById('width');
-    const heightInput = document.getElementsByName('height')[0] || document.getElementById('height');
+    const lengthInput = document.getElementsByName('length')[0] || document.getElementById('length');
     const densityInput = document.getElementsByName('density')[0] || document.getElementById('density');
 
     const payload = {
       width: widthInput ? parseInt(widthInput.value, 10) : 12,
-      height: heightInput ? parseInt(heightInput.value, 10) : 12,
+      height: lengthInput ? parseInt(lengthInput.value, 10) : 12, // Maps length safely to backend height
       density: densityInput ? parseFloat(densityInput.value) : 0.5,
       timestamp: new Date().toISOString()
     };
 
-    // Task 3: Single explicit console log for verification
     console.log("NativePlanr Pipeline Transmission Payload:", JSON.stringify(payload, null, 2));
+
 
     this.matrixDisplay.innerHTML = `
       <div class="loading-shroud">
