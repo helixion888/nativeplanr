@@ -3,68 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NativePlanr MVP — Habitat Layout Canvas</title>
+  <title>NativePlanr — Ecological Habitat Designer</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="app-navbar">
-    <div class="brand-shell">
-      <h1 class="logo-text">NativePlanr</h1>
-      <span class="version-tag">MVP Application Shell</span>
-    </div>
-  </header>
 
-  <main class="viewport-workspace">
-    <section class="control-sidebar">
-      <h2 class="panel-headline">Plot Parameters</h2>
+  <main class="app-container">
+    
+    <header class="botanical-header">
+      <h1 class="site-title">NativePlanr</h1>
+      <p class="site-tagline">Midwestern Prairie & Native Habitat Restoration Blueprint Engine</p>
+    </header>
+
+    <section class="form-container">
       <form id="garden-input-form" class="parameter-form">
-        <div class="control-group">
-          <label for="plot-width">Plot Width (Feet)</label>
-          <input type="number" id="plot-width" name="width" value="12" min="4" max="100" required>
-        </div>
         
-        <div class="control-group">
-          <label for="plot-length">Plot Length (Feet)</label>
-          <input type="number" id="plot-length" name="length" value="12" min="4" max="100" required>
-        </div>
-
-        <div class="control-group">
-          <label for="soil-type">Soil Classification</label>
-          <select id="soil-type" name="soil_type" required>
-            <option value="loam">Rich Loam Topsoil</option>
-            <option value="clay">Heavy Structural Clay</option>
-            <option value="sand">Coarse Well-Drained Sand</option>
-            <option value="wet_muck">Hydric High-Organic Muck</option>
+        <div class="form-group">
+          <label for="state">Target State</label>
+          <select id="state" name="state" required>
+            <option value="MI">Michigan</option>
+            <option value="IL">Illinois</option>
+            <option value="IN">Indiana</option>
+            <option value="OH">Ohio</option>
+            <option value="WI">Wisconsin</option>
+            <option value="MN">Minnesota</option>
+            <option value="IA">Iowa</option>
           </select>
         </div>
 
-        <div class="control-group">
-          <label for="garden-type">System Target Niche</label>
-          <select id="garden-type" name="garden_type" required>
-            <option value="pollinator">Lepidoptera Pollinator Ribbon</option>
-            <option value="prairie">Oak Opening Grassland Prairie</option>
-            <option value="rain_garden">Hydrological Infiltration Rain Basin</option>
-            <option value="lawn_replacement">Biodiverse Living Mulch Turf</option>
+        <div class="form-group">
+          <label for="county">County <span class="optional-label">(Optional)</span></label>
+          <input type="text" id="county" name="county" placeholder="e.g., Washtenaw">
+        </div>
+
+        <div class="form-group">
+          <label for="garden-type">What kind of native garden do you want to design?</label>
+          <select id="garden-type" name="garden-type" required>
+            <option value="pollinator">Butterfly & Pollinator Garden</option>
+            <option value="woodland">Woodland Edge Garden</option>
+            <option value="part-shade">Part Shade Flower Garden</option>
+            <option value="rain-garden">Wet Soil / Rain Garden</option>
+            <option value="meadow">Native Meadow Garden</option>
+            <option value="low-maintenance">Low-Maintenance Native Garden</option>
+            <option value="deer-resistant">Deer-Resistant Native Garden</option>
           </select>
         </div>
 
-        <button type="submit" id="submit-btn" class="action-button">Simulate System Layout</button>
+        <div class="form-group">
+          <label for="pathway">Do you want a path through the garden?</label>
+          <select id="pathway" name="pathway" required>
+            <option value="none">No path through design</option>
+            <option value="grass">Grass Path</option>
+            <option value="woodchips">Woodchip Path</option>
+            <option value="gravel">Gravel Path</option>
+            <option value="pavers">Paver Path</option>
+            <option value="dirt">Dirt Path</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="soil">What kind of soil are you working with?</label>
+          <select id="soil" name="soil" required>
+            <option value="rich-loam">Rich Loam</option>
+            <option value="sandy">Sandy / Fast Draining</option>
+            <option value="slight-clay">Slightly Clay</option>
+            <option value="heavy-clay">Heavy Clay</option>
+            <option value="wet-soggy">Wet / Soggy</option>
+            <option value="swampy">Swampy / Standing Water</option>
+          </select>
+        </div>
+
+        <div class="dimensions-row">
+          <div class="form-group compact">
+            <label for="width">Plot Width (ft)</label>
+            <input type="number" id="width" name="width" value="12" min="4" max="40" required>
+          </div>
+          <div class="form-group compact">
+            <label for="length">Plot Length (ft)</label>
+            <input type="number" id="length" name="length" value="12" min="4" max="40" required>
+          </div>
+          <input type="hidden" id="density" name="density" value="0.5">
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" id="submit-btn" class="action-button">Design Your Garden Now</button>
+        </div>
       </form>
     </section>
 
-  <section class="canvas-viewport">
-  <div class="canvas-container">
-    <h2 class="panel-headline">Ecosystem Planting Grid</h2>
-    <div id="ui-loading-indicator" class="loading-shroud hidden">Analyzing soil and community layouts...</div>
-    <div id="render-target-canvas">
-      <div class="canvas-placeholder-text" style="font-family: Georgia, serif; font-style: italic; color: #736657; text-align: center; padding: 3rem 1rem;">
-        Configure layout constraints above and select simulate to initialize the landscape map.
+    <section class="canvas-viewport">
+      <div class="canvas-container">
+        
+        <div id="render-target-canvas">
+          <div class="canvas-placeholder-text">
+            Configure site analysis metrics above and click "Design Your Garden Now" to construct your custom botanical blueprint map.
+          </div>
+        </div>
+
       </div>
-    </div>
-  </div>
-</section>
+    </section>
+
   </main>
 
-  <script type="module" src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
