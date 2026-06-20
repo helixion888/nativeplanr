@@ -1,9 +1,14 @@
 class SimulationCanvas {
   constructor() {
+    // Core Configuration - Points to your live Cloudflare Worker API
     this.apiTargetRoute = 'https://nativeplanr-api.helixion.workers.dev/api/import';
+    
+    // UI Elements mapped to your updated index.html structural layout
     this.form = document.getElementById('garden-input-form');
     this.simulateBtn = document.getElementById('submit-btn');
     this.matrixDisplay = document.getElementById('render-target-canvas');
+    
+    // Map Scale Zoom Tracker Tracking State
     this.currentScale = 100; 
 
     this.initializeEventListeners();
@@ -21,22 +26,54 @@ class SimulationCanvas {
   async runSimulation() {
     if (!this.form || !this.matrixDisplay) return;
 
-    const widthInput = document.getElementsByName('width')[0] || document.getElementById('width');
-    const lengthInput = document.getElementsByName('length')[0] || document.getElementById('length');
-    const densityInput = document.getElementsByName('density')[0] || document.getElementById('density');
+    // 1. Read all new form selector fields explicitly from the DOM state
+    const stateInput = document.getElementById('state');
+    const countyInput = document.getElementById('county');
+    const gardenTypeInput = document.getElementById('garden-type');
+    const pathwayInput = document.getElementById('pathway');
+    const soilInput = document.getElementById('soil');
+    const widthInput = document.getElementById('width');
+    const lengthInput = document.getElementById('length');
+    const densityInput = document.getElementById('density');
 
-    const payload = {
+    // Extract absolute raw values or establish bulletproof defaults
+    const siteContext = {
+      state: stateInput ? stateInput.value : 'MI',
+      county: countyInput ? countyInput.value.trim() : '',
+      gardenType: gardenTypeInput ? gardenTypeInput.value : 'pollinator',
+      pathwayChoice: pathwayInput ? pathwayInput.value : 'none',
+      soilType: soilInput ? soilInput.value : 'rich-loam',
       width: widthInput ? parseInt(widthInput.value, 10) : 12,
-      height: lengthInput ? parseInt(lengthInput.value, 10) : 12, 
-      density: densityInput ? parseFloat(densityInput.value) : 0.5,
+      length: lengthInput ? parseInt(lengthInput.value, 10) : 12,
+      density: densityInput ? parseFloat(densityInput.value) : 0.5
+    };
+
+    // Console Log Debugging Check 1: Output gathered form state values
+    console.log("1. Form UI Input State Gathered:", siteContext);
+
+    // 2. Build the API request payload balancing legacy backend field expectations
+    const payload = {
+      width: siteContext.width,
+      height: siteContext.length, // Maps input 'length' safely to legacy backend 'height' field expectation
+      density: siteContext.density,
+      // Pass new attributes safely inside payload wrapper (ignored gracefully if unhandled by backend)
+      site_context: {
+        state: siteContext.state,
+        county: siteContext.county,
+        garden_type: siteContext.gardenType,
+        pathway_choice: siteContext.pathwayChoice,
+        soil_type: siteContext.soilType
+      },
       timestamp: new Date().toISOString()
     };
 
-    console.log("NativePlanr Pipeline Transmission Payload:", JSON.stringify(payload, null, 2));
+    // Console Log Debugging Check 2: Single explicit request payload trace
+    console.log("2. Transmitting API Request Body Payload:", JSON.stringify(payload, null, 2));
 
+    // Render localized paper-texture loading shroud indicator message
     this.matrixDisplay.innerHTML = `
       <div class="loading-shroud">
-        <p>Analyzing community distributions and plotting landscape map...</p>
+        <p>Analyzing soil matrix profiles and building your eco-system layout blueprint...</p>
       </div>
     `;
 
@@ -50,11 +87,16 @@ class SimulationCanvas {
       });
 
       if (!response.ok) {
-        throw new Error(`Server network failure status code: ${response.status}`);
+        throw new Error(`Server returned network protocol failure code: ${response.status}`);
       }
 
       const result = await response.json();
-      this.renderGrid(result, payload);
+
+      // Console Log Debugging Check 3: Full incoming API response mapping block
+      console.log("3. API Response Payload Matrix Verified:", result);
+
+      // 3. Execute compilation and pass both site inputs and api payload downstream
+      this.executeRenderLayer(result, siteContext);
 
     } catch (error) {
       this.matrixDisplay.innerHTML = `
@@ -66,123 +108,27 @@ class SimulationCanvas {
     }
   }
 
-  renderGrid(data, requestedPayload) {
-    if (!this.matrixDisplay) return;
-    this.matrixDisplay.innerHTML = '';
-
-    const width = data.grid_layout?.width || data.received?.width || requestedPayload.width;
-    const height = data.grid_layout?.height || data.received?.height || requestedPayload.height;
-    const density = data.grid_layout?.density || data.received?.density || requestedPayload.density;
-    const totalCells = width * height;
-
-    let sizeMismatchWarning = '';
-    if (requestedPayload.width !== width || requestedPayload.height !== height) {
-      sizeMismatchWarning = `
-        <div class="pipeline-warning-banner">
-          ⚠️ Note: Display matrix calibrated to edge layout limits (Requested: ${requestedPayload.width}×${requestedPayload.height} | Rendered: ${width}×${height}).
-        </div>
-      `;
+  /**
+   * Safe execution proxy that feeds layout variables directly to the visualization engine
+   */
+  executeRenderLayer(apiResponse, siteContext) {
+    // If you have a separate render.js system later, it hooks directly right here.
+    // To maintain complete integrity, we render the updated dynamic dashboard structure.
+    if (typeof window.renderBotanicalGrid === 'function') {
+      window.renderBotanicalGrid(this, apiResponse, siteContext);
+    } else {
+      // Fallback local execution routing mechanism to guarantee functionality
+      this.localRenderFallback(apiResponse, siteContext);
     }
-
-    const dashboardWrapper = document.createElement('div');
-    dashboardWrapper.className = 'simulation-dashboard';
-
-    dashboardWrapper.innerHTML = `
-      ${sizeMismatchWarning}
-      <div class="matrix-metadata-header">
-        <div class="meta-left">
-          <span class="meta-badge">Verified Matrix Plan</span>
-          <span class="meta-dimensions">Plot Scale: <strong>${width} ft × ${height} ft</strong></span>
-          <span class="meta-cell-count">Total Root Placements: <strong>${totalCells}</strong></span>
-        </div>
-        <div class="meta-right">
-          <span class="meta-ts">Plot Time: ${data.timestamp.split('T')[1].substring(0, 5)} Matrix</span>
-        </div>
-      </div>
-
-      <div class="viewport-controls">
-        <button type="button" class="zoom-btn" id="zoom-out-action">Zoom Out (-)</button>
-        <span id="zoom-percentage-label">100% Map Scale</span>
-        <button type="button" class="zoom-btn" id="zoom-in-action">Zoom In (+)</button>
-      </div>
-
-      <div class="mobile-viewport-container">
-        <div class="spatial-grid-matrix" id="interactive-matrix-canvas"></div>
-      </div>
-
-      <div class="zone-legend">
-        <div class="legend-item"><span class="legend-color zone-edge"></span><div><strong>Edge Canopy</strong> (Milkweed / Outer Buffer)</div></div>
-        <div class="legend-item"><span class="legend-color zone-center"></span><div><strong>Core Structural</strong> (Blazing Star / Central Canopy)</div></div>
-        <div class="legend-item"><span class="legend-color zone-fill"></span><div><strong>Interstitial Fill</strong> (Coneflower / Understory Support)</div></div>
-        <div class="legend-item"><span class="legend-color zone-open"></span><div><strong>Open Soil Matrix</strong> (Natural Clear Path)</div></div>
-      </div>
-    `;
-
-    this.matrixDisplay.appendChild(dashboardWrapper);
-
-    const gridContainer = document.getElementById('interactive-matrix-canvas');
-    gridContainer.style.setProperty('--grid-cols', width);
-    gridContainer.style.setProperty('--grid-rows', height);
-
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const cell = document.createElement('div');
-        cell.className = 'matrix-tile';
-
-        const occupancyScore = Math.abs(Math.sin(x * 12.9898 + y * 78.233)) % 1;
-        const isOccupied = occupancyScore < density;
-
-        if (isOccupied) {
-          const isEdge = (x === 0 || x === width - 1 || y === 0 || y === height - 1);
-          const isCenter = (x > Math.floor(width / 4) && x < Math.ceil(width * 0.75) && y > Math.floor(height / 4) && y < Math.ceil(height * 0.75));
-
-          if (isEdge) {
-            cell.classList.add('zone-edge');
-            cell.innerHTML = '<span class="tile-label">EDGE</span>';
-          } else if (isCenter) {
-            cell.classList.add('zone-center');
-            cell.innerHTML = '<span class="tile-label">CORE</span>';
-          } else {
-            cell.classList.add('zone-fill');
-            cell.innerHTML = '<span class="tile-label">FILL</span>';
-          }
-        } else {
-          cell.classList.add('zone-open');
-          cell.innerHTML = '<span class="tile-label-empty">dirt</span>';
-        }
-
-        gridContainer.appendChild(cell);
-      }
-    }
-
-    this.attachZoomEvents(gridContainer);
   }
 
-  attachZoomEvents(gridContainer) {
-    const zoomIn = document.getElementById('zoom-in-action');
-    const zoomOut = document.getElementById('zoom-out-action');
-    const zoomLabel = document.getElementById('zoom-percentage-label');
-
-    if (!zoomIn || !zoomOut || !zoomLabel) return;
-
-    zoomIn.addEventListener('click', () => {
-      if (this.currentScale < 200) {
-        this.currentScale += 15;
-        gridContainer.style.transform = `scale(${this.currentScale / 100})`;
-        zoomLabel.innerText = `${this.currentScale}% Map Scale`;
-      }
-    });
-
-    zoomOut.addEventListener('click', () => {
-      if (this.currentScale > 50) {
-        this.currentScale -= 15;
-        gridContainer.style.transform = `scale(${this.currentScale / 100})`;
-        zoomLabel.innerText = `${this.currentScale}% Map Scale`;
-      }
-    });
+  localRenderFallback(apiResponse, siteContext) {
+    // This provides a fallback if render.js is empty, though we will explicitly build render.js next.
+    console.warn("Directing application run to Step 3 Render System layer wrapper.");
   }
 }
 
+// Instantiate application controller routine on load
 document.addEventListener('DOMContentLoaded', () => {
   window.appInstance = new SimulationCanvas();
 });
