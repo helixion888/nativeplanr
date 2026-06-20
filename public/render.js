@@ -4,7 +4,6 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
 
   displayContainer.innerHTML = '';
 
-  // Use plotLength explicitly to avoid any 'height' variable collision errors
   const plotWidth = Number(apiResponse?.grid_layout?.width || apiResponse?.received?.width || siteContext?.width || 12);
   const plotLength = Number(apiResponse?.grid_layout?.length || apiResponse?.grid_layout?.height || apiResponse?.received?.length || apiResponse?.received?.height || siteContext?.length || 12);
   const density = Number(apiResponse?.grid_layout?.density || apiResponse?.received?.density || siteContext?.density || 0.5);
@@ -52,6 +51,9 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
   const readableGardenType = gardenTypeMap[siteContext.gardenType] || 'Native Habitat';
   const readableSoilType = soilTypeMap[siteContext.soilType] || 'Unclassified Soil';
   const readablePathType = pathTypeMap[siteContext.pathwayChoice] || 'No Path';
+
+  // Track global infrastructure state outside loop scope to fix reference errors
+  const globalPathStatus = siteContext.pathwayChoice !== 'none';
 
   let designRationale = `This design favors long-blooming native species, key host plants, and structural root configurations that support biodiversity through the season.`;
   if (siteContext.gardenType === 'pollinator') {
@@ -119,9 +121,8 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
       tile.className = 'matrix-tile';
 
       const isPathRow = (y === Math.floor(plotLength / 2));
-      const hasPathChosen = siteContext.pathwayChoice !== 'none';
 
-      if (hasPathChosen && isPathRow) {
+      if (globalPathStatus && isPathRow) {
         tile.classList.add(`path-style-${siteContext.pathwayChoice}`);
         tile.innerHTML = `
           <span class="tile-icon-element">🪵</span>
@@ -172,7 +173,7 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
     <div class="legend-item"><span class="legend-color zone-open"></span><div><strong>Open Clearance:</strong> Natural Soil Gaps (${dirtCellCount} sq ft)</div></div>
   `;
 
-  if (hasPathChosen) {
+  if (globalPathStatus) {
     legendContent += `
       <div class="legend-item"><span class="legend-color path-style-${siteContext.pathwayChoice}"></span><div><strong>Infrastructure:</strong> ${readablePathType} (${pathCellCount} Cells Reserved)</div></div>
     `;
