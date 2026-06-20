@@ -1,89 +1,157 @@
 /* ==========================================================================
-   NATIVEPLANR BOTANICAL DESIGN SYSTEM
-   Inspired by Midwestern Prairie Restoration Layouts & Print Field Guides
+   NATIVEPLANR BOTANICAL STYLING SYSTEM
+   Inspired by Midwestern Prairie Field Manuals & Landscape Architecture Prints
    ========================================================================== */
 
-/* Core Document Elements */
+/* 1. Global Reset & Base Canvas Environment */
 body {
-  background-color: #fbf9f5;
-  color: #2c2520;
+  background-color: #fbf9f5; /* Warm Antique Parchment Paper */
+  color: #2c2520; /* Deep Charcoal Wood Bark */
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  line-height: 1.6;
+  line-height: 1.5;
   padding: 1.5rem;
   margin: 0;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden; /* Prevent page-breaking horizontal shifts */
 }
 
-/* Typography Hierarchy */
-h1, h2, h3, h4, .panel-headline {
+/* Base Document Layout Constraints */
+.app-container {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Traditional Botanical Editorial Header */
+.botanical-header {
+  text-align: center;
+  padding: 1rem 0;
+  border-bottom: 2px solid #e2dbcd;
+  margin-bottom: 0.5rem;
+}
+
+.site-title {
   font-family: Georgia, Cambria, "Times New Roman", Times, serif;
-  color: #1e3f29; /* Dark Forest Green */
+  font-size: 2.5rem;
   font-weight: 700;
-  margin-top: 0;
+  color: #1e3f29; /* Deep Prairie Canopy Green */
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.02em;
 }
 
-p {
-  color: #4a3f35; /* Soft Muted Charcoal Bark */
+.site-tagline {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: #635345; /* Soft Muted Walnut */
+  margin: 0;
 }
 
-/* Editorial Container Card layout */
-.canvas-viewport, .parameter-form {
-  background-color: #f3f0e7; /* Seedling Parchment Paper */
+/* ==========================================================================
+   FORM & INPUTS FRAMEWORK (TOUCH-FRIENDLY & PRINT-INSPIRED)
+   ========================================================================== */
+.form-container {
+  background-color: #f4f0e6; /* Soft Seedling Paper Card */
   border: 1px solid #dfdacb;
   border-radius: 6px;
   padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(44, 37, 32, 0.05);
+  box-shadow: 0 1px 3px rgba(44, 37, 32, 0.04);
 }
 
-/* Touch-Friendly Inputs & Labels */
-.parameter-form label {
+.parameter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.form-group label {
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #1e3f29;
-  display: block;
-  margin-bottom: 0.4rem;
+  letter-spacing: 0.01em;
 }
 
-.parameter-form input, .parameter-form select {
+.optional-label {
+  font-weight: 400;
+  font-style: italic;
+  color: #7a6e62;
+}
+
+/* Accessible Select and Field Boxes */
+.parameter-form input, 
+.parameter-form select {
   background-color: #fbf9f5;
   color: #2c2520;
   border: 1px solid #cfc4b2;
   border-radius: 4px;
-  padding: 0.6rem 0.8rem;
+  padding: 0.7rem 0.8rem;
   font-size: 1rem;
   font-family: inherit;
   width: 100%;
   box-sizing: border-box;
+  appearance: none; /* Modern style adjustments */
+  -webkit-appearance: none;
 }
 
-.parameter-form input:focus {
-  border-color: #689f7d;
+/* Custom drop-down chevron injection */
+.parameter-form select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231e3f29' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 2.5rem;
+}
+
+.parameter-form input:focus,
+.parameter-form select:focus {
+  border-color: #558766; /* Sage boundary accent highlight */
   outline: none;
+  box-shadow: 0 0 0 3px rgba(85, 135, 102, 0.15);
 }
 
-/* The Restoration Action Button */
+/* Grid Dimension Inline Selector Rows */
+.dimensions-row {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.form-group.compact {
+  flex: 1;
+}
+
+/* Landscape Placement Action Submission Buttons */
 .action-button {
-  background-color: #386b4a; /* Prairie Canopy Green */
+  background-color: #2e5c3e; /* Rich Forest Moss */
   color: #fbf9f5;
   border: none;
-  padding: 0.8rem 1.5rem;
   border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 600;
+  padding: 0.9rem 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   cursor: pointer;
   transition: background-color 0.15s ease;
   width: 100%;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  box-shadow: 0 2px 4px rgba(46, 92, 62, 0.1);
 }
 
 .action-button:hover {
-  background-color: #244b31;
+  background-color: #1c3c27;
 }
 
 /* ==========================================================================
-   SIMULATION GRID CANVAS LAYOUTS (MOBILE-SAFE & RESPONSIVE)
+   SIMULATION OUTPUT OVERLAYS & RESULTS STYLES
    ========================================================================== */
 .simulation-dashboard {
   display: flex;
@@ -92,181 +160,271 @@ p {
   width: 100%;
 }
 
-/* Warnings and Metas Panel Elements */
-.pipeline-warning-banner {
-  background-color: #fffaf0;
-  border: 1px solid #d69e2e;
-  color: #744210;
-  padding: 0.75rem 1rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
+/* 2. Analytical Site Context Summary Panel Box */
+.botanical-summary-panel {
+  background-color: #faf6ed;
+  border-left: 4px solid #558766; /* Elegant Sage Leaf structural bar */
+  border-top: 1px solid #e6decb;
+  border-right: 1px solid #e6decb;
+  border-bottom: 1px solid #e6decb;
+  border-radius: 0 4px 4px 0;
+  padding: 1.25rem;
 }
 
-.matrix-metadata-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  font-size: 0.9rem;
-  border-bottom: 2px solid #dfdacb;
-  padding-bottom: 0.75rem;
-  color: #4a3f35;
-}
-
-.meta-badge {
-  background-color: #e9f2ec;
+.summary-headline {
+  font-family: Georgia, serif;
+  font-size: 1.15rem;
   color: #1e3f29;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 0.75rem;
-  border: 1px solid #689f7d;
+  margin: 0 0 0.75rem 0;
 }
 
-/* Viewport Controls */
+.summary-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.6rem 1rem;
+  font-size: 0.85rem;
+  border-bottom: 1px dashed #dcd3be;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.summary-item strong {
+  color: #635345;
+  display: block;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.summary-item span {
+  font-weight: 600;
+  color: #2c2520;
+}
+
+.summary-educational-text {
+  font-size: 0.9rem;
+  color: #4a3f35;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 3. Section Headers */
+.blueprint-section-header {
+  margin-top: 0.5rem;
+}
+
+.panel-headline {
+  font-family: Georgia, Cambria, serif;
+  font-size: 1.6rem;
+  color: #1e3f29;
+  margin: 0;
+}
+
+/* 4. Map Scale Viewport Controls Panel Bar */
 .viewport-controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #eaddcd; /* Deeper Warm Parchment Base */
-  padding: 0.5rem 1rem;
+  background-color: #eaddcd; /* Soft Mulch Base */
+  padding: 0.5rem 0.75rem;
   border-radius: 4px;
-  font-size: 0.85rem;
-  color: #2c2520;
+  border: 1px solid #cfc4b2;
 }
 
 .zoom-btn {
-  background: #fbf9f5;
-  border: 1px solid #cfc4b2;
+  background-color: #fbf9f5;
   color: #2c2520;
-  padding: 0.35rem 0.75rem;
+  border: 1px solid #bfae97;
   border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: 600;
+  transition: background-color 0.1s ease;
 }
 
 .zoom-btn:hover {
-  background: #f3f0e7;
+  background-color: #f4f0e6;
 }
 
-/* Mobile Panning Container */
+#zoom-percentage-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #4a3f35;
+  font-family: Georgia, serif;
+  font-style: italic;
+}
+
+/* 5. Mobile-Safe Panning Enclosure Viewport Mechanics */
 .mobile-viewport-container {
   width: 100%;
-  overflow: auto;
-  background-color: #eaddcd; /* Soft Dirt/Mulch Underlay */
+  overflow: auto; /* Activates natural native fluid swiping on mobile touchscreens */
+  background-color: #e6dfd3; /* Textured earthen bed boundary matrix background */
   border: 1px solid #cfc4b2;
   border-radius: 6px;
-  padding: 1.5rem;
+  padding: 1.25rem;
   box-sizing: border-box;
   touch-action: pan-x pan-y;
   -webkit-overflow-scrolling: touch;
 }
 
-/* The Matrix Structural Blueprint */
+/* 6. Dynamic Grid Resolution Canvas Blueprint Matrix */
 .spatial-grid-matrix {
   display: grid;
-  grid-template-columns: repeat(var(--grid-cols, 12), minmax(52px, 1fr)); /* Larger touch targets for field work */
-  grid-template-rows: repeat(var(--grid-rows, 12), minmax(52px, 1fr));
-  gap: 6px;
+  /* Locks minimum column boundaries to prevent cell crushing on mobile */
+  grid-template-columns: repeat(var(--grid-cols, 12), minmax(64px, 1fr));
+  grid-template-rows: repeat(var(--grid-rows, 12), minmax(64px, 1fr));
+  gap: 5px;
   width: max-content;
   margin: 0 auto;
   transform-origin: top center;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
 }
 
-/* Plant Blueprint Cells */
+/* 7. Botanical Tile Graphics Structure */
 .matrix-tile {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  font-weight: 500;
-  aspect-ratio: 1 / 1;
   box-sizing: border-box;
-  user-select: none;
-  padding: 2px;
+  padding: 4px;
   text-align: center;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+  user-select: none;
+  box-shadow: inset 0 -1px 2px rgba(0,0,0,0.03), 0 1px 2px rgba(44,37,32,0.02);
 }
 
-/* Native Zone Color Rulesets */
-.zone-edge { 
-  background-color: #e9f2ec; 
-  color: #1e3f29; 
-  border: 1px solid #689f7d; 
-}
-.zone-center { 
-  background-color: #f3ebf7; 
-  color: #4c2d59; 
-  border: 1px solid #ad83be; 
-}
-.zone-fill { 
-  background-color: #fdf6e2; 
-  color: #634413; 
-  border: 1px solid #dca341; 
-}
-.zone-open { 
-  background-color: #f5efe4; 
-  color: #a69988; 
-  border: 1px dashed #cfc4b2; 
+.tile-icon-element {
+  font-size: 1.3rem;
+  margin-bottom: 2px;
+  line-height: 1;
 }
 
-/* Micro Typography for Botanical Labels */
 .tile-label {
   font-size: 0.65rem;
   font-weight: 700;
   line-height: 1.1;
-  word-break: break-all;
   text-transform: uppercase;
-}
-.tile-label-empty {
-  font-size: 0.75rem;
-  font-weight: bold;
+  letter-spacing: -0.01em;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
-/* Botanical Legend Block Layout */
+/* 8. Authentic Habitat Color System Palette Rulesets */
+.zone-edge {
+  background-color: #e9f5ed; /* Milkweed Leaf Green */
+  color: #193822;
+  border: 1px solid #8cbfa0;
+}
+
+.zone-center {
+  background-color: #f5edf8; /* Blazing Star Violet / Purple */
+  color: #441f52;
+  border: 1px solid #caa3d6;
+}
+
+.zone-fill {
+  background-color: #fef8e7; /* Coneflower / Muted Prairie Gold */
+  color: #5c4314;
+  border: 1px solid #e0c282;
+}
+
+.zone-open {
+  background-color: #f5efe4; /* Exposed Clear Soil Patch */
+  color: #8c7e6e;
+  border: 1px dashed #cfc4b2;
+}
+
+/* 9. Front-End Pathway Texture Masks Overrides */
+.path-style-grass { background-color: #d1e7d6; color: #1e3f29; border: 1px dashed #689f7d; }
+.path-style-woodchips { background-color: #ebdcd0; color: #5c4314; border: 1px dashed #a07855; }
+.path-style-gravel { background-color: #e2e4e6; color: #43464a; border: 1px dashed #9aa0a6; }
+.path-style-pavers { background-color: #cfd2d6; color: #202124; border: 1px solid #70757a; }
+.path-style-dirt { background-color: #dfcebe; color: #4e3621; border: 1px dashed #8b5a2b; }
+
+/* 10. Clear Landscape Index Legends Matrix Layout */
 .zone-legend {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.75rem;
-  background: #fdfbf7;
-  padding: 1rem;
-  border-radius: 4px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.8rem;
+  background-color: #fbf9f5;
+  padding: 1.25rem;
+  border-radius: 6px;
   border: 1px solid #dfdacb;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.01);
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.75rem;
   font-size: 0.85rem;
   color: #4a3f35;
 }
 
 .legend-color {
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
   display: inline-block;
   flex-shrink: 0;
 }
 
-/* Loading/Error states matching paper texture rulesets */
-.loading-shroud {
-  padding: 3rem 1rem;
-  text-align: center;
-  color: #1e3f29;
+/* 11. Empty/Error/Loading Blueprint Placeholders States */
+.canvas-placeholder-text {
   font-family: Georgia, serif;
   font-style: italic;
+  font-size: 1.05rem;
+  color: #736657;
+  text-align: center;
+  padding: 4rem 2rem;
+  line-height: 1.6;
+}
+
+.loading-shroud {
+  font-family: Georgia, serif;
+  font-style: italic;
+  color: #1e3f29;
+  text-align: center;
+  padding: 5rem 2rem;
+  animation: visualPulse 1.8s infinite ease-in-out;
 }
 
 .canvas-error-state {
   border: 1px dashed #c53030;
-  background: #fff5f5;
+  background-color: #fff5f5;
   color: #9b2c2c;
   padding: 2rem;
   border-radius: 4px;
   text-align: center;
+}
+
+@keyframes visualPulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1.0; }
+  100% { opacity: 0.6; }
+}
+
+/* ==========================================================================
+   RESPONSIVE LAYOUT UPGRADES (MEDIA QUERY BREAKPOINTS)
+   ========================================================================== */
+@media (min-width: 640px) {
+  body {
+    padding: 2.5rem 2rem;
+  }
+  
+  .parameter-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
+  }
+  
+  .dimensions-row {
+    grid-column: span 2;
+  }
+  
+  .form-actions {
+    grid-column: span 2;
+  }
 }
