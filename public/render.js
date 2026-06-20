@@ -176,4 +176,72 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
   legendElement.className = 'zone-legend';
 
   let legendMarkup = '';
-  Object.
+  Object.entries(plantCounts).forEach(([name, count]) => {
+    let swatchClass = 'zone-fill';
+    if (name.includes('Milkweed')) swatchClass = 'zone-edge';
+    if (name.includes('Coneflower') || name.includes('Shrub')) swatchClass = 'zone-center';
+    if (name.includes('(Matrix)')) swatchClass = 'zone-open';
+
+    legendMarkup += `
+      <div class="legend-item">
+        <span class="legend-color ${swatchClass}"></span>
+        <div><strong>${name}:</strong> ${count} Plugs Ordered</div>
+      </div>
+    `;
+  });
+
+  if (globalPathStatus) {
+    legendMarkup += `
+      <div class="legend-item">
+        <span class="legend-color path-style-${siteContext.pathwayChoice}"></span>
+        <div><strong>Infrastructure:</strong> ${readablePathType} (${pathCellCount} sq ft)</div>
+      </div>
+    `;
+  }
+
+  legendElement.innerHTML = legendMarkup;
+
+  // Track viewport dimensions map zooms actions
+  attachInteractiveScaleActions(canvasInstance, gridContainer);
+};
+
+// Scale Actions Engine Definition
+function attachInteractiveScaleActions(canvasInstance, gridContainer) {
+  const zoomIn = document.getElementById('zoom-in-action');
+  const zoomOut = document.getElementById('zoom-out-action');
+  const zoomReset = document.getElementById('zoom-reset-action');
+  const zoomLabel = document.getElementById('zoom-percentage-label');
+
+  if (!zoomIn || !zoomOut || !zoomReset || !zoomLabel) return;
+
+  canvasInstance.currentScale = 100;
+
+  zoomIn.addEventListener('click', () => {
+    if (canvasInstance.currentScale < 200) {
+      canvasInstance.currentScale += 20;
+      gridContainer.style.transform = `scale(${canvasInstance.currentScale / 100})`;
+      zoomLabel.innerText = `${canvasInstance.currentScale}% Map Scale`;
+    }
+  });
+
+  zoomOut.addEventListener('click', () => {
+    if (canvasInstance.currentScale > 60) {
+      canvasInstance.currentScale -= 20;
+      gridContainer.style.transform = `scale(${canvasInstance.currentScale / 100})`;
+      zoomLabel.innerText = `${canvasInstance.currentScale}% Map Scale`;
+    }
+  });
+
+  zoomReset.addEventListener('click', () => {
+    canvasInstance.currentScale = 100;
+    gridContainer.style.transform = 'scale(1)';
+    zoomLabel.innerText = '100% Map Scale';
+  });
+}
+
+// Intercept routing link checks to auto-boot local rendering actions
+if (window.appInstance) {
+  window.appInstance.executeRenderLayer = function(apiResponse, siteContext) {
+    window.renderBotanicalGrid(this, apiResponse, siteContext);
+  };
+}
