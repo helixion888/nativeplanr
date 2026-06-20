@@ -8,7 +8,6 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
   const plotWidth = Number(apiResponse?.grid_layout?.width || siteContext?.width || 12);
   const plotLength = Number(apiResponse?.grid_layout?.length || apiResponse?.grid_layout?.height || siteContext?.length || 12);
   
-  // 1. EXTRACT LIVE SERVER ARRAY (Strictly utilize backend cells array payload)
   const backendCells = apiResponse?.grid_layout?.cells || [];
   
   // Guard Clause against empty or completely missing layout payloads
@@ -16,27 +15,11 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
     displayContainer.innerHTML = `
       <div class="canvas-error-state">
         <h3>Ecosystem Design Blueprint Empty</h3>
-        <p>The network pipeline was completed successfully, but no habitat layout cells were returned from the backend instance. Please re-run selection matrix metrics.</p>
+        <p>The network pipeline completed successfully, but no habitat layout cells were returned from the backend. Please re-run selection matrix metrics.</p>
       </div>
     `;
     return;
   }
-
-  // 2. RUNTIME TELEMETRY DIAGNOSTICS GENERATION BLOCK
-  const uniquePlantNames = [...new Set(backendCells.map(c => c.common_name || c.plant_id))];
-  const diagnosticsSnippet = backendCells.slice(0, 5);
-
-  const debugPanel = document.createElement('div');
-  debugPanel.style.cssText = 'background:#faf0e6; border:2px dashed #2e5c3e; padding:1rem; font-family:monospace; font-size:0.8rem; margin-bottom:1.5rem; color:#2c2520; border-radius:4px; text-align:left; line-height:1.4;';
-  debugPanel.innerHTML = `
-    <strong>[TELEMETRY PIPELINE DIAGNOSTICS]</strong><br>
-    • Source Authentication: <span style="color:#2e5c3e;font-weight:bold;">Backend layout received successfully.</span><br>
-    • Total Backend Cells Received in Wire: <strong>${backendCells.length} cells</strong><br>
-    • Unique Plant Varieties in Payload: <strong>${uniquePlantNames.length}</strong> (${uniquePlantNames.join(', ')})<br>
-    • Raw Matrix Sample Data (First 5 Cells):
-    <pre style="background:#fbf9f5; padding:0.5rem; margin-top:0.5rem; overflow:auto; border:1px solid #dfdacb; font-size:0.75rem;">${JSON.stringify(diagnosticsSnippet, null, 2)}</pre>
-  `;
-  displayContainer.appendChild(debugPanel);
 
   // Label Dictionary Mappings for Summary Panel text strings
   const gardenTypeMap = {
@@ -125,11 +108,9 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
   gridContainer.style.setProperty('--grid-cols', plotWidth);
   gridContainer.style.setProperty('--grid-rows', plotLength);
 
-  // Initialize tracking counts
   let plantCounts = {};
   let pathCellCount = 0;
 
-  // Icon repository pulled cleanly from public domain field parameters
   const emojiInventory = {
     'Common Milkweed': '🌿',
     'Purple Coneflower': '🌸',
@@ -148,10 +129,8 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
     'MATRIX_GRASS': 'zone-open'
   };
 
-  // Sort and order incoming elements based strictly on coordinates array
   const orderedCells = [...backendCells].sort((a, b) => (a.y - b.y) || (a.x - b.x));
 
-  // 3. MAP DIRECT ARRAY LAYER ITERATION (No client-side mathematical generation variables)
   orderedCells.forEach((cellData) => {
     const tile = document.createElement('div');
     tile.className = 'matrix-tile';
@@ -159,7 +138,6 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
     const currentY = cellData.y;
     const isPathRow = (currentY === Math.floor(plotLength / 2));
 
-    // frontend-only infrastructure pathway mask overlay injection logic
     if (globalPathStatus && isPathRow) {
       tile.classList.add(`path-style-${siteContext.pathwayChoice}`);
       tile.innerHTML = `
@@ -168,11 +146,9 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
       `;
       pathCellCount++;
     } else {
-      // Pull structural variables directly derived from API cell entries
       const commonName = cellData.common_name || cellData.plant_id || 'Unknown Flora';
       const zoneKey = cellData.zone || 'FILL';
       
-      // Determine structural class tokens smoothly
       let stylingClass = zoneStyleMap[zoneKey] || 'zone-fill';
       if (commonName.includes('(Matrix)')) {
         stylingClass = 'zone-open';
@@ -186,81 +162,18 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
         <span class="tile-label">${commonName}</span>
       `;
 
-      // Track quantities matrices dynamically
       plantCounts[commonName] = (plantCounts[commonName] || 0) + 1;
     }
 
     gridContainer.appendChild(tile);
   });
 
-  // Calculate live plugs count accurately
   let cumulativePlugs = 0;
   Object.values(plantCounts).forEach(c => cumulativePlugs += c);
   document.getElementById('summary-total-plugs-count').innerText = `${cumulativePlugs} Est. Plugs`;
 
-  // Draw legend
   const legendElement = document.getElementById('dark-legend-container-box');
   legendElement.className = 'zone-legend';
 
   let legendMarkup = '';
-  Object.entries(plantCounts).forEach(([name, count]) => {
-    let swatchClass = 'zone-fill';
-    if (name.includes('Milkweed')) swatchClass = 'zone-edge';
-    if (name.includes('Coneflower') || name.includes('Shrub')) swatchClass = 'zone-center';
-    if (name.includes('(Matrix)')) swatchClass = 'zone-open';
-
-    legendMarkup += `
-      <div class="legend-item">
-        <span class="legend-color ${swatchClass}"></span>
-        <div><strong>${name}:</strong> ${count} Plugs Ordered</div>
-      </div>
-    `;
-  });
-
-  if (globalPathStatus) {
-    legendMarkup += `
-      <div class="legend-item">
-        <span class="legend-color path-style-${siteContext.pathwayChoice}"></span>
-        <div><strong>Infrastructure:</strong> ${readablePathType} (${pathCellCount} sq ft)</div>
-      </div>
-    `;
-  }
-
-  legendElement.innerHTML = legendMarkup;
-
-  // Track viewport dimensions map zooms actions
-  attachInteractiveScaleActions(canvasInstance, gridContainer);
-};
-
-function attachInteractiveScaleActions(canvasInstance, gridContainer) {
-  const zoomIn = document.getElementById('zoom-in-action');
-  const zoomOut = document.getElementById('zoom-out-action');
-  const zoomReset = document.getElementById('zoom-reset-action');
-  const zoomLabel = document.getElementById('zoom-percentage-label');
-
-  if (!zoomIn || !zoomOut || !zoomReset || !zoomLabel) return;
-
-  canvasInstance.currentScale = 100;
-
-  zoomIn.addEventListener('click', () => {
-    if (canvasInstance.currentScale < 200) {
-      canvasInstance.currentScale += 20;
-      gridContainer.style.transform = `scale(${canvasInstance.currentScale / 100})`;
-      zoomLabel.innerText = `${canvasInstance.currentScale}% Map Scale`;
-    }
-  });
-
-  zoomOut.addEventListener('click', () => {
-    if (canvasInstance.currentScale > 60) {
-      canvasInstance.currentScale -= 20;
-      gridContainer.style.transform = `scale(${canvasInstance.currentScale / 100})`;
-      zoomLabel.innerText = `${canvasInstance.currentScale}% Map Scale`;
-    }
-  });
-
-  zoomReset.addEventListener('click', () => {
-    canvasInstance.currentScale = 100;
-    gridContainer.style.transform = 'scale(1)';
-    zoomLabel.innerText = '100% Map Scale';
-  });
-}
+  Object.
