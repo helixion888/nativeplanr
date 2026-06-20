@@ -52,7 +52,6 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
   const readableSoilType = soilTypeMap[siteContext.soilType] || 'Unclassified Soil';
   const readablePathType = pathTypeMap[siteContext.pathwayChoice] || 'No Path';
 
-  // Track global infrastructure state outside loop scope to fix reference errors
   const globalPathStatus = siteContext.pathwayChoice !== 'none';
 
   let designRationale = `This design favors long-blooming native species, key host plants, and structural root configurations that support biodiversity through the season.`;
@@ -105,14 +104,15 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
   gridContainer.style.setProperty('--grid-cols', plotWidth);
   gridContainer.style.setProperty('--grid-rows', plotLength);
 
-  let plantCounts = { edge: 0, core: 0, fill: 0 };
+  let plantCounts = { edge: 0, core: 0, fill: 0, matrixGrass: 0 };
   let pathCellCount = 0;
-  let dirtCellCount = 0;
 
+  // Authentic Public Domain Botanical Design Palette
   const localSpeciesDictionary = {
     'EDGE': { name: 'Common Milkweed', icon: '🌿', zoneClass: 'zone-edge' },
     'CORE': { name: 'Purple Coneflower', icon: '🌸', zoneClass: 'zone-center' },
-    'FILL': { name: 'Rough Blazing Star', icon: '🌾', zoneClass: 'zone-fill' }
+    'FILL': { name: 'Rough Blazing Star', icon: '🔮', zoneClass: 'zone-fill' },
+    'MATRIX_GRASS': { name: 'Prairie Dropseed (Matrix)', icon: '🌾', zoneClass: 'zone-open' }
   };
 
   for (let y = 0; y < plotLength; y++) {
@@ -151,9 +151,10 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
             plantCounts.fill++;
           }
         } else {
-          tile.classList.add('zone-open');
-          tile.innerHTML = `<span class="tile-icon-element">🪱</span><span class="tile-label">Soil Matrix</span>`;
-          dirtCellCount++;
+          // FIXED: Abstract "Soil Matrix/Dirt" completely reassigned to structural baseline matrix grasses
+          tile.classList.add(localSpeciesDictionary['MATRIX_GRASS'].zoneClass);
+          tile.innerHTML = `<span class="tile-icon-element">${localSpeciesDictionary['MATRIX_GRASS'].icon}</span><span class="tile-label">${localSpeciesDictionary['MATRIX_GRASS'].name}</span>`;
+          plantCounts.matrixGrass++;
         }
       }
 
@@ -161,21 +162,22 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
     }
   }
 
-  const grandTotalPlacements = plantCounts.edge + plantCounts.core + plantCounts.fill;
-  document.getElementById('summary-total-plugs-count').innerText = `${grandTotalPlacements} Live Plugs`;
+  // Aggregate genuine vegetation count summaries
+  const grandTotalPlacements = plantCounts.edge + plantCounts.core + plantCounts.fill + plantCounts.matrixGrass;
+  document.getElementById('summary-total-plugs-count').innerText = `${grandTotalPlacements} Est. Plugs`;
 
   const legendContainer = document.getElementById('dynamic-botanical-legend');
   
   let legendContent = `
-    <div class="legend-item"><span class="legend-color zone-edge"></span><div><strong>Edge Canopy:</strong> ${localSpeciesDictionary['EDGE'].name} (${plantCounts.edge} Plugs)</div></div>
-    <div class="legend-item"><span class="legend-color zone-center"></span><div><strong>Core Structural:</strong> ${localSpeciesDictionary['CORE'].name} (${plantCounts.core} Plugs)</div></div>
-    <div class="legend-item"><span class="legend-color zone-fill"></span><div><strong>Interstitial Fill:</strong> ${localSpeciesDictionary['FILL'].name} (${plantCounts.fill} Plugs)</div></div>
-    <div class="legend-item"><span class="legend-color zone-open"></span><div><strong>Open Clearance:</strong> Natural Soil Gaps (${dirtCellCount} sq ft)</div></div>
+    <div class="legend-item"><span class="legend-color zone-edge"></span><div><strong>Edge Border:</strong> ${localSpeciesDictionary['EDGE'].name} (${plantCounts.edge} Plugs)</div></div>
+    <div class="legend-item"><span class="legend-color zone-center"></span><div><strong>Core Accent:</strong> ${localSpeciesDictionary['CORE'].name} (${plantCounts.core} Plugs)</div></div>
+    <div class="legend-item"><span class="legend-color zone-fill"></span><div><strong>Interstitial Cluster:</strong> ${localSpeciesDictionary['FILL'].name} (${plantCounts.fill} Plugs)</div></div>
+    <div class="legend-item"><span class="legend-color zone-open"></span><div><strong>Grounding Understory:</strong> ${localSpeciesDictionary['MATRIX_GRASS'].name} (${plantCounts.matrixGrass} Plugs)</div></div>
   `;
 
   if (globalPathStatus) {
     legendContent += `
-      <div class="legend-item"><span class="legend-color path-style-${siteContext.pathwayChoice}"></span><div><strong>Infrastructure:</strong> ${readablePathType} (${pathCellCount} Cells Reserved)</div></div>
+      <div class="legend-item"><span class="legend-color path-style-${siteContext.pathwayChoice}"></span><div><strong>Infrastructure:</strong> ${readablePathType} (${pathCellCount} sq ft)</div></div>
     `;
   }
 
