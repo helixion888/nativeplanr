@@ -5,8 +5,8 @@ class SimulationCanvas {
     
     // UI Elements
     this.form = document.getElementById('garden-input-form');
-this.simulateBtn = document.getElementById('submit-btn');
-    this.matrixDisplay = document.getElementById('matrix-display');
+    this.simulateBtn = document.getElementById('submit-btn');
+    this.matrixDisplay = document.getElementById('render-target-canvas');
     
     this.initializeEventListeners();
   }
