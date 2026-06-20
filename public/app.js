@@ -52,11 +52,10 @@ class SimulationCanvas {
     console.log("1. Form UI Input State Gathered:", siteContext);
 
     // 2. Build the API request payload balancing legacy backend field expectations
-    const payload = {
+   const payload = {
       width: siteContext.width,
-      height: siteContext.length, // Maps input 'length' safely to legacy backend 'height' field expectation
+      length: siteContext.length, // Perfectly clean naming match!
       density: siteContext.density,
-      // Pass new attributes safely inside payload wrapper (ignored gracefully if unhandled by backend)
       site_context: {
         state: siteContext.state,
         county: siteContext.county,
