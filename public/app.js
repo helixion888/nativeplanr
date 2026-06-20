@@ -8,6 +8,9 @@ class SimulationCanvas {
     this.simulateBtn = document.getElementById('submit-btn');
     this.matrixDisplay = document.getElementById('render-target-canvas');
     
+    // Zoom/Scale Tracking State
+    this.currentScale = 100; 
+
     this.initializeEventListeners();
   }
 
@@ -23,18 +26,25 @@ class SimulationCanvas {
   async runSimulation() {
     if (!this.form || !this.matrixDisplay) return;
 
-    const formData = new FormData(this.form);
+    // Task 1 & 2: Explicitly parse and verify structural constraints from form fields
+    const widthInput = document.getElementsByName('width')[0] || document.getElementById('width');
+    const heightInput = document.getElementsByName('height')[0] || document.getElementById('height');
+    const densityInput = document.getElementsByName('density')[0] || document.getElementById('density');
+
     const payload = {
-      width: parseInt(formData.get('width') || '12'),
-      height: parseInt(formData.get('height') || '12'),
-      density: parseFloat(formData.get('density') || '0.5'),
+      width: widthInput ? parseInt(widthInput.value, 10) : 12,
+      height: heightInput ? parseInt(heightInput.value, 10) : 12,
+      density: densityInput ? parseFloat(densityInput.value) : 0.5,
       timestamp: new Date().toISOString()
     };
+
+    // Task 3: Single explicit console log for verification
+    console.log("NativePlanr Pipeline Transmission Payload:", JSON.stringify(payload, null, 2));
 
     this.matrixDisplay.innerHTML = `
       <div class="loading-shroud">
         <div class="spinner"></div>
-        <p>Computing optimal spatial matrix at edge server...</p>
+        <p>Transmitting specifications to edge server grid matrix...</p>
       </div>
     `;
 
@@ -48,80 +58,98 @@ class SimulationCanvas {
       });
 
       if (!response.ok) {
-        throw new Error(`Server returned status code: ${response.status}`);
+        throw new Error(`Server network failure status code: ${response.status}`);
       }
 
       const result = await response.json();
-      this.renderGrid(result);
+      this.renderGrid(result, payload);
 
     } catch (error) {
       this.matrixDisplay.innerHTML = `
         <div class="canvas-error-state">
-          <h3>Simulation Link Failure</h3>
+          <h3>Simulation Pipeline Interrupted</h3>
           <p>${error.message}</p>
         </div>
       `;
     }
   }
 
-  renderGrid(data) {
+  renderGrid(data, requestedPayload) {
     if (!this.matrixDisplay) return;
     this.matrixDisplay.innerHTML = '';
 
-    // Extract structure from API response, or fallback gracefully using payload parameters
-    const width = data.received?.width || 12;
-    const height = data.received?.height || 12;
-    const density = data.received?.density || 0.5;
+    // Task 5: Dynamic fallback prioritizing direct engine parameters
+    const width = data.grid_layout?.width || data.received?.width || requestedPayload.width;
+    const height = data.grid_layout?.height || data.received?.height || requestedPayload.height;
+    const density = data.grid_layout?.density || data.received?.density || requestedPayload.density;
+    const totalCells = width * height;
 
-    // Create main layout wrapper
+    // Task 4 & 8: Structural verification check
+    let sizeMismatchWarning = '';
+    if (requestedPayload.width !== width || requestedPayload.height !== height) {
+      sizeMismatchWarning = `
+        <div class="pipeline-warning-banner">
+          ⚠️ Edge Server Response Size Mismatch (Requested: ${requestedPayload.width}×${requestedPayload.height} | Rendered: ${width}×${height}). Showing simulated fallback matrix.
+        </div>
+      `;
+    }
+
+    // Main Dashboard Interface Layout Creation
     const dashboardWrapper = document.createElement('div');
     dashboardWrapper.className = 'simulation-dashboard';
 
-    // 1. Build Metadata Header
-    const header = document.createElement('div');
-    header.className = 'matrix-metadata-header';
-    header.innerHTML = `
-      <div>
-        <span class="meta-badge">Matrix Verified</span>
-        <span class="meta-ts">Timestamp: ${data.timestamp}</span>
+    // Task 6 & 7: Dimensions & Metadata Panel View
+    dashboardWrapper.innerHTML = `
+      ${sizeMismatchWarning}
+      <div class="matrix-metadata-header">
+        <div class="meta-left">
+          <span class="meta-badge">Active Matrix</span>
+          <span class="meta-dimensions">Dimensions: <strong>${width} ft × ${height} ft</strong></span>
+          <span class="meta-cell-count">Total Target Cells: <strong>${totalCells}</strong></span>
+        </div>
+        <div class="meta-right">
+          <span class="meta-ts">Timestamp: ${data.timestamp.split('T')[1].substring(0, 8)}</span>
+        </div>
+      </div>
+
+      <div class="viewport-controls">
+        <button type="button" class="zoom-btn" id="zoom-out-action">Zoom Out (-)</button>
+        <span id="zoom-percentage-label">100% Scale</span>
+        <button type="button" class="zoom-btn" id="zoom-in-action">Zoom In (+)</button>
+      </div>
+
+      <div class="mobile-viewport-container">
+        <div class="spatial-grid-matrix" id="interactive-matrix-canvas"></div>
+      </div>
+
+      <div class="zone-legend">
+        <div class="legend-item"><span class="legend-color zone-edge"></span><strong>Edge Zone</strong> (Perimeter Canopy)</div>
+        <div class="legend-item"><span class="legend-color zone-center"></span><strong>Center Zone</strong> (Core Structural)</div>
+        <div class="legend-item"><span class="legend-color zone-fill"></span><strong>Fill Zone</strong> (Understory/Support)</div>
+        <div class="legend-item"><span class="legend-color zone-open"></span><strong>Open Space</strong> (Clearance)</div>
       </div>
     `;
-    dashboardWrapper.appendChild(header);
 
-    // 2. Build the Legend Matrix
-    const legend = document.createElement('div');
-    legend.className = 'zone-legend';
-    legend.innerHTML = `
-      <div class="legend-item"><span class="legend-color zone-edge"></span><strong>Edge Zone</strong> (Perimeter Canopy/Buffer)</div>
-      <div class="legend-item"><span class="legend-color zone-center"></span><strong>Center Zone</strong> (Core Structural/Overstory)</div>
-      <div class="legend-item"><span class="legend-color zone-fill"></span><strong>Fill Zone</strong> (Understory/Support/Guild)</div>
-      <div class="legend-item"><span class="legend-color zone-open"></span><strong>Open Space</strong> (Optimal Clearance)</div>
-    `;
-    dashboardWrapper.appendChild(legend);
+    this.matrixDisplay.appendChild(dashboardWrapper);
 
-    // 3. Build Spatial Grid Canvas
-    const gridContainer = document.createElement('div');
-    gridContainer.className = 'spatial-grid-matrix';
-    
-    // Dynamically inject CSS variables to enforce grid sizing layouts
+    // Grab the injected container inside the wrapper to construct tiles
+    const gridContainer = document.getElementById('interactive-matrix-canvas');
     gridContainer.style.setProperty('--grid-cols', width);
     gridContainer.style.setProperty('--grid-rows', height);
 
-    // Render the grid elements sequentially
+    // Sequential matrix coordinate tile injection loop
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const cell = document.createElement('div');
         cell.className = 'matrix-tile';
 
-        // Determine if tile is occupied based on target density
-        // A deterministic pseudo-random distribution linked to x/y coordinates
+        // Deterministic pseudo-random generation tied strictly to coordinate matrices
         const occupancyScore = Math.abs(Math.sin(x * 12.9898 + y * 78.233)) % 1;
         const isOccupied = occupancyScore < density;
 
         if (isOccupied) {
-          // Categorize structural ecological zones
           const isEdge = (x === 0 || x === width - 1 || y === 0 || y === height - 1);
-          const isCenter = (x > Math.floor(width/4) && x < Math.ceil(width * 0.75) && y > Math.floor(height/4) && y < Math.ceil(height * 0.75));
+          const isCenter = (x > Math.floor(width / 4) && x < Math.ceil(width * 0.75) && y > Math.floor(height / 4) && y < Math.ceil(height * 0.75));
 
           if (isEdge) {
             cell.classList.add('zone-edge');
@@ -142,12 +170,36 @@ class SimulationCanvas {
       }
     }
 
-    dashboardWrapper.appendChild(gridContainer);
-    this.matrixDisplay.appendChild(dashboardWrapper);
+    // Task 9: Initialize scale adjust control functionality
+    this.attachZoomEvents(gridContainer);
+  }
+
+  attachZoomEvents(gridContainer) {
+    const zoomIn = document.getElementById('zoom-in-action');
+    const zoomOut = document.getElementById('zoom-out-action');
+    const zoomLabel = document.getElementById('zoom-percentage-label');
+
+    if (!zoomIn || !zoomOut || !zoomLabel) return;
+
+    zoomIn.addEventListener('click', () => {
+      if (this.currentScale < 200) {
+        this.currentScale += 15;
+        gridContainer.style.transform = `scale(${this.currentScale / 100})`;
+        zoomLabel.innerText = `${this.currentScale}% Scale`;
+      }
+    });
+
+    zoomOut.addEventListener('click', () => {
+      if (this.currentScale > 50) {
+        this.currentScale -= 15;
+        gridContainer.style.transform = `scale(${this.currentScale / 100})`;
+        zoomLabel.innerText = `${this.currentScale}% Scale`;
+      }
+    });
   }
 }
 
-// Initialize application on DOM load
+// Instantiate ecosystem script
 document.addEventListener('DOMContentLoaded', () => {
   window.appInstance = new SimulationCanvas();
 });
