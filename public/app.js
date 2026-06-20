@@ -4,8 +4,8 @@ class SimulationCanvas {
     this.apiTargetRoute = 'https://nativeplanr-api.helixion.workers.dev/api/import';
     
     // UI Elements
-    this.form = document.getElementById('constraints-form');
-    this.simulateBtn = document.getElementById('simulate-btn');
+    this.form = document.getElementById('garden-input-form');
+this.simulateBtn = document.getElementById('submit-btn');
     this.matrixDisplay = document.getElementById('matrix-display');
     
     this.initializeEventListeners();
