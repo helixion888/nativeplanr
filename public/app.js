@@ -1,82 +1,79 @@
-// public/app.js
-// ============================================================================
-// NATIVEPLANR MVP APPLICATION SHELL: UNIFIED ORCHESTRATION PIPELINE
-// ============================================================================
-
-import { ClientRenderBridge } from './render.js';
-
-class MvpApplicationController {
+class SimulationCanvas {
   constructor() {
-    this.inputForm = document.getElementById('garden-input-form');
-    this.canvasViewContainer = document.getElementById('render-target-canvas');
-    this.loadingIndicator = document.getElementById('ui-loading-indicator');
-    this.submitButton = document.getElementById('submit-btn');
+    // Core Configuration
+    this.apiTargetRoute = 'https://nativeplanr-api.helixion.workers.dev/api/import';
     
-    this.apiTargetRoute = 'https://nativeplanr-api.helixion.workers.dev/api/import'; // Connects cleanly into Module 9 routing parameters
+    // UI Elements
+    this.form = document.getElementById('constraints-form');
+    this.simulateBtn = document.getElementById('simulate-btn');
+    this.matrixDisplay = document.getElementById('matrix-display');
+    
+    this.initializeEventListeners();
   }
 
-  initialize() {
-    this.inputForm.addEventListener('submit', (event) => this.handleFormSubmission(event));
+  initializeEventListeners() {
+    if (this.form) {
+      this.form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.runSimulation();
+      });
+    }
   }
 
-  async handleFormSubmission(event) {
-    event.preventDefault();
-    this.toggleLoadingState(true);
+  async runSimulation() {
+    if (!this.form || !this.matrixDisplay) return;
 
-    const formData = new FormData(this.inputForm);
-    const apiPayloadContract = {
-      width: parseInt(formData.get('width'), 10),
-      length: parseInt(formData.get('length'), 10),
-      soil_type: formData.get('soil_type'),
-      garden_type: formData.get('garden_type')
+    // Extract values from form input fields
+    const formData = new FormData(this.form);
+    const payload = {
+      width: parseInt(formData.get('width') || '10'),
+      height: parseInt(formData.get('height') || '10'),
+      density: parseFloat(formData.get('density') || '0.5'),
+      timestamp: new Date().toISOString()
     };
 
+    this.matrixDisplay.innerHTML = '<div class="loading">Calculating optimal spatial matrix...</div>';
+
     try {
-      const networkResponse = await fetch(this.apiTargetRoute, {
+      const response = await fetch(this.apiTargetRoute, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(apiPayloadContract)
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
 
-      if (!networkResponse.ok) {
-        throw new Error(`HTTP Network Transport Exception: Remote system returned status ${networkResponse.status}`);
+      if (!response.ok) {
+        throw new Error(`Server returned status code: ${response.status}`);
       }
 
-      const generatedBlueprintResult = await networkResponse.json();
-      ClientRenderBridge.executeDomProjection(this.canvasViewContainer, generatedBlueprintResult);
+      const result = await response.json();
+      this.renderGrid(result);
 
-    } catch (pipelineProcessingFault) {
-      console.error("NativePlanr MVP Core System Fault:", pipelineProcessingFault);
-      this.renderErrorState(pipelineProcessingFault.message);
-    } finally {
-      this.toggleLoadingState(false);
+    } catch (error) {
+      this.matrixDisplay.innerHTML = `<div class="error">Simulation Link Failure: ${error.message}</div>`;
     }
   }
 
-  toggleLoadingState(isLoading) {
-    if (isLoading) {
-      this.loadingIndicator.classList.remove('hidden');
-      this.submitButton.disabled = true;
-      this.submitButton.style.opacity = '0.6';
-    } else {
-      this.loadingIndicator.classList.add('hidden');
-      this.submitButton.disabled = false;
-      this.submitButton.style.opacity = '1.0';
-    }
-  }
-
-  renderErrorState(errorMessage) {
-    this.canvasViewContainer.removeAttribute('style');
-    this.canvasViewContainer.innerHTML = `
-      <div class="canvas-placeholder-text" style="border-color: #ef4444; color: #b91c1c; background-color: #fef2f2;">
-        <strong>Simulation Operational Pipeline Interrupted</strong><br>
-        <span style="font-size: 0.85rem; margin-top: 0.5rem; display: block;">${errorMessage}</span>
-      </div>
-    `;
+  renderGrid(data) {
+    if (!this.matrixDisplay) return;
+    
+    // Clear out the loading notice message
+    this.matrixDisplay.innerHTML = '';
+    
+    const container = document.createElement('div');
+    container.className = 'grid-canvas-container';
+    
+    const summary = document.createElement('p');
+    summary.className = 'status-success';
+    summary.innerText = `Matrix verified at edge server. Timestamp: ${data.timestamp}`;
+    container.appendChild(summary);
+    
+    this.matrixDisplay.appendChild(container);
   }
 }
 
+// Initialize application on DOM load
 document.addEventListener('DOMContentLoaded', () => {
-  const nativePlanrApp = new MvpApplicationController();
-  nativePlanrApp.initialize();
+  window.appInstance = new SimulationCanvas();
 });
