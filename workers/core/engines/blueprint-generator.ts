@@ -1,258 +1,199 @@
-// workers/core/engines/blueprint-generator.ts
-// ============================================================================
-// NATIVEPLANR INTERIOR ENGINE - DETERMINISTIC LANDSCAPE ARCHITECTURE MATRIX
-// ============================================================================
-
-import { LocationRepository } from '../db/repositories';
-import { OutputNormalizer } from './output-normalizer';
-
-/**
- * Strict data contract for raw incoming request parameters.
- */
-export interface BlueprintInput {
-  zip_code: string;
-  width: number;       // Yard dimension measurement in feet
-  length: number;      // Yard dimension measurement in feet
-  soil_type: 'clay' | 'loam' | 'sand' | 'wet_muck';
-  garden_type: 'pollinator' | 'prairie' | 'rain_garden' | 'lawn_replacement';
-  strict_mode?: boolean; // 🔒 Simulation Lock Mode Stabilization Parameter
+// Define internal strict types for the engine
+interface SiteContext {
+  state: string;
+  county: string;
+  garden_type: string;
+  pathway_choice: string;
+  soil_type: string;
 }
 
-/**
- * Botanical structure definition for internal taxonomy mapping.
- */
-export interface PlantProfile {
-  id: string;
+interface GeneratorPayload {
+  width: number;
+  height: number;
+  length?: number; // Handle both key styles seamlessly
+  density: number;
+  site_context?: SiteContext;
+  timestamp: string;
+}
+
+interface CellOutput {
+  zone: 'EDGE' | 'CORE' | 'FILL' | 'MATRIX_GRASS';
   scientific_name: string;
   common_name: string;
-  ecological_role: 'structural' | 'pollinator_magnet' | 'groundcover' | 'buffer';
-  bloom_period: string;
+  type: 'flower' | 'grass' | 'shrub';
 }
 
-interface CatalogPlant extends PlantProfile {
-  soil_suitability: Record<string, number>;
-  garden_suitability: Record<string, number>;
-  spacing_factor: number;
-  moisture_preference: number;
-  sun_preference: number;
-  height_ft: number;
-  sprawl_factor: number;
-  interaction_radius: number;
-  attracts: string[];
-  repels: string[];
-  moisture_mod: number;
-  shade_mod: number;
-}
-
-interface CellState {
-  x: number;
-  y: number;
-  plant_id: string | null;
-  moisture: number;
-  fertility: number;
-  shade: number;
-  stability: number;
-}
-
-export interface GridCell {
-  x: number;
-  y: number;
-  plant_id: string;
-  zone: 'edge' | 'center' | 'fill';
-}
-
-export interface BlueprintResult {
-  location: {
-    zip_code: string;
-    county_name: string;
-    state_code: string;
-    ecoregion_stub: string;
-  };
-  soil_type: string;
-  garden_type: string;
-  plant_list: PlantProfile[];
-  grid_layout: GridCell[];
-  seasonal_notes: string[];
-  seo_metadata: {
-    title_suggestion: string;
-    meta_description: string;
-    keywords: string[];
-  };
-}
-
+/**
+ * Ecosystem Blueprint Generator Matrix Engine
+ * Implements Phase 1 Step 2: Clustered Ecological Drift Layouts
+ */
 export class BlueprintGenerator {
-  private static readonly PLANT_CATALOG: CatalogPlant[] = [
-    {
-      id: "p1", scientific_name: "Asclepias syriaca", common_name: "Common Milkweed",
-      ecological_role: "pollinator_magnet", bloom_period: "Summer", spacing_factor: 2,
-      soil_suitability: { clay: 0.6, loam: 1, sand: 0.8, wet_muck: 0.2 },
-      garden_suitability: { pollinator: 1, prairie: 0.9, rain_garden: 0.3, lawn_replacement: 0.7 },
-      moisture_preference: 0.5, sun_preference: 0.9, height_ft: 4, sprawl_factor: 0.6,
-      interaction_radius: 4, attracts: ["p4"], repels: [], moisture_mod: -0.01, shade_mod: 0
-    },
-    {
-      id: "p2", scientific_name: "Echinacea purpurea", common_name: "Purple Coneflower",
-      ecological_role: "structural", bloom_period: "Summer", spacing_factor: 1.5,
-      soil_suitability: { clay: 0.7, loam: 1, sand: 0.6, wet_muck: 0.1 },
-      garden_suitability: { pollinator: 1, prairie: 1, rain_garden: 0.2, lawn_replacement: 0.6 },
-      moisture_preference: 0.4, sun_preference: 1, height_ft: 3, sprawl_factor: 0.3,
-      interaction_radius: 3, attracts: [], repels: [], moisture_mod: 0, shade_mod: 0
-    }
-  ];
-
-  constructor(private locationRepo: LocationRepository) {}
-
-  async generate(input: BlueprintInput): Promise<BlueprintResult> {
-    const locData = await this.locationRepo.getByZipCode(input.zip_code);
-
-    const locationInfo = {
-      zip_code: input.zip_code,
-      county_name: locData?.county_name || "Unknown County",
-      state_code: locData?.state_code || "US",
-      ecoregion_stub: locData ? `Ecoregion Matrix Layer [${locData.state_code}_T1]` : "Generic Temperate"
+  
+  /**
+   * Main Generation Vector Routing Loop
+   */
+  public static generate(payload: GeneratorPayload): any {
+    const width = Number(payload.width || 12);
+    // Support consistent multi-naming mapping variables safely
+    const length = Number(payload.length || payload.height || 12);
+    const density = Number(payload.density || 0.5);
+    const ctx = payload.site_context || {
+      state: 'MI',
+      county: '',
+      garden_type: 'pollinator',
+      pathway_choice: 'none',
+      soil_type: 'rich-loam'
     };
 
-    const plantPalette = this.resolvePlantPalette(input);
-    const simulatedGrid = this.simulateHabitat(input.width, input.length, plantPalette as CatalogPlant[], input.strict_mode);
-    const gridLayout = this.toGridCells(simulatedGrid);
+    // Initialize an empty layout coordinate map matrix
+    const matrix: CellOutput[][] = Array(length).fill(null).map(() => 
+      Array(width).fill(null).map(() => ({
+        zone: 'MATRIX_GRASS',
+        scientific_name: 'Prairie Dropseed',
+        common_name: 'Prairie Dropseed (Matrix)',
+        type: 'grass'
+      }))
+    );
 
-    const rawResult: BlueprintResult = {
-      location: locationInfo,
-      soil_type: input.soil_type,
-      garden_type: input.garden_type,
-      plant_list: plantPalette,
-      grid_layout: gridLayout,
-      seasonal_notes: [
-        "Spring: emergence phase stabilization required",
-        "Summer: pollinator density peak expected",
-        "Autumn: biomass integration into soil layer"
-      ],
-      seo_metadata: {
-        title_suggestion: `Native ${input.garden_type} habitat design for ${locationInfo.county_name}`,
-        meta_description: `Ecological simulation-based planting layout optimized for ${input.soil_type} soil conditions.`,
-        keywords: ["native plants", "habitat simulation", "ecological design"]
+    // Track multi-tile footprints using a structural placement collision grid
+    const structuralMask = Array(length).fill(null).map(() => Array(width).fill(false));
+
+    // Determine target balance metrics based on structural Garden Theme Type
+    const isWoodland = ctx.garden_type === 'woodland';
+    const isMeadow = ctx.garden_type === 'meadow';
+    const isRainGarden = ctx.garden_type === 'rain-garden';
+    const isDeerResistant = ctx.garden_type === 'deer-resistant';
+
+    // Establish dynamic composition limits scaled directly to Plot Size boundaries
+    const totalSqFt = width * length;
+    const maxDrifts = totalSqFt < 64 ? 2 : totalSqFt < 200 ? 5 : 9;
+    const includeShrubs = totalSqFt >= 100 && (isWoodland || ctx.garden_type === 'low-maintenance' || isRainGarden);
+
+    // Seed 1: Shrub Placement Logic (Anchors occupying 2x2 or larger footprints)
+    if (includeShrubs) {
+      const shrubCount = totalSqFt < 200 ? 1 : 2;
+      for (let s = 0; s < shrubCount; s++) {
+        // Position anchors near intermediate core-center boundaries
+        const targetY = Math.floor(length / 3) + (s * 2);
+        const targetX = Math.floor(width / 3) + (s * 2);
+
+        if (targetY + 1 < length && targetX + 1 < width) {
+          const shrubName = isWoodland ? "Serviceberry" : "Buttonbush";
+          const shrubSci = isWoodland ? "Amelanchier laevis" : "Cephalanthus occidentalis";
+          
+          // Allocate a multi-tile block footprint configuration
+          for (let dy = 0; dy < 2; dy++) {
+            for (let dx = 0; dx < 2; dx++) {
+              matrix[targetY + dy][targetX + dx] = {
+                zone: 'CORE',
+                scientific_name: shrubSci,
+                common_name: `${shrubName} Shrub Anchor`,
+                type: 'shrub'
+              };
+              structuralMask[targetY + dy][targetX + dx] = true;
+            }
+          }
+        }
       }
-    };
-
-    // 🔒 SYSTEM STABILIZATION INTEGRATION STEPS
-    const normalizedResult = OutputNormalizer.normalize(rawResult);
-    OutputNormalizer.validateBlueprintResult(normalizedResult);
-
-    return normalizedResult;
-  }
-
-  private resolvePlantPalette(input: BlueprintInput): PlantProfile[] {
-    const scored = BlueprintGenerator.PLANT_CATALOG.map(p => ({
-      plant: p,
-      score: this.scorePlant(p, input)
-    }));
-
-    scored.sort((a, b) => b.score - a.score);
-
-    const diverse: CatalogPlant[] = [];
-    const roleCount: Record<string, number> = {};
-
-    for (const item of scored.map(s => s.plant)) {
-      const role = item.ecological_role;
-      roleCount[role] = roleCount[role] || 0;
-
-      if (roleCount[role] < 3) {
-        diverse.push(item);
-        roleCount[role]++;
-      }
-      if (diverse.length >= 8) break;
     }
 
-    return diverse.map(p => ({
-      id: p.id,
-      scientific_name: p.scientific_name,
-      common_name: p.common_name,
-      ecological_role: p.ecological_role,
-      bloom_period: p.bloom_period
-    }));
-  }
+    // Seed 2: Deterministic Clustered Flower Drifts Engine (3-9 irregular cell groups)
+    for (let d = 0; d < maxDrifts; d++) {
+      // Deterministic generation values based on seed input matrices
+      const seedY = Math.floor((Math.abs(Math.sin(d * 45.3 + 12.1)) * 100) % length);
+      const seedX = Math.floor((Math.abs(Math.cos(d * 23.7 + 89.4)) * 100) % width);
+      
+      if (structuralMask[seedY][seedX]) continue;
 
-  private scorePlant(plant: CatalogPlant, input: BlueprintInput): number {
-    const soil = plant.soil_suitability[input.soil_type] || 0;
-    const garden = plant.garden_suitability[input.garden_type] || 0;
+      // Determine height stratification rules based on coordinate perimeter distance
+      const distanceToEdgeY = Math.min(seedY, length - 1 - seedY);
+      const distanceToEdgeX = Math.min(seedX, width - 1 - seedX);
+      const minPerimeterDist = Math.min(distanceToEdgeY, distanceToEdgeX);
 
-    if (!soil || !garden) return 0;
+      let chosenZone: 'EDGE' | 'CORE' | 'FILL' = 'FILL';
+      let speciesName = "Rough Blazing Star";
+      let speciesSci = "Liatris aspera";
 
-    let score = soil * garden;
+      if (minPerimeterDist === 0) {
+        // Height Stratification: Edge Border Perennials (Short)
+        chosenZone = 'EDGE';
+        speciesName = isRainGarden ? "Fox Sedge" : isDeerResistant ? "Wild Bergamot" : "Common Milkweed";
+        speciesSci = isRainGarden ? "Carex vulpinoidea" : isDeerResistant ? "Monarda fistulosa" : "Asclepias syriaca";
+      } else if (minPerimeterDist > Math.floor(Math.min(width, length) / 4)) {
+        // Height Stratification: Core Center Structural Backbones (Tall)
+        chosenZone = 'CORE';
+        speciesName = isRainGarden ? "Swamp Milkweed" : isMeadow ? "Big Bluestem" : "Purple Coneflower";
+        speciesSci = isRainGarden ? "Asclepias incarnata" : isMeadow ? "Andropogon gerardii" : "Echinacea purpurea";
+      }
 
-    const roleBoost =
-      input.garden_type === 'pollinator' && plant.ecological_role === 'pollinator_magnet' ? 1.5 :
-      input.garden_type === 'prairie' && plant.ecological_role === 'structural' ? 1.3 :
-      input.garden_type === 'rain_garden' && plant.ecological_role === 'buffer' ? 1.4 :
-      input.garden_type === 'lawn_replacement' && plant.ecological_role === 'groundcover' ? 1.4 :
-      1;
+      // Bleed Drift Cluster into neighboring coordinate points
+      const driftSize = 3 + Math.floor((Math.abs(Math.sin(d * 14.2)) * 100) % 7); // Clustered group sizes of 3-9
+      let placedInDrift = 0;
 
-    const stabilityPenalty = plant.sprawl_factor > 0.7 ? 0.85 : 1;
+      for (let steps = 0; steps < driftSize * 2 && placedInDrift < driftSize; steps++) {
+        const offsetX = Math.floor(Math.sin(steps * 1.5) * 1.9);
+        const offsetY = Math.floor(Math.cos(steps * 1.5) * 1.9);
+        const targetY = Math.max(0, Math.min(length - 1, seedY + offsetY));
+        const targetX = Math.max(0, Math.min(width - 1, seedX + offsetX));
 
-    return +(score * roleBoost * stabilityPenalty).toFixed(5);
-  }
+        if (!structuralMask[targetY][targetX]) {
+          matrix[targetY][targetX] = {
+            zone: chosenZone,
+            scientific_name: speciesSci,
+            common_name: speciesName,
+            type: 'flower'
+          };
+          structuralMask[targetY][targetX] = true;
+          placedInDrift++;
+        }
+      }
+    }
 
-  private simulateHabitat(width: number, length: number, plants: CatalogPlant[], strictMode?: boolean): CellState[] {
-    const grid: CellState[] = [];
+    // Step 3: Construct Interstitial Matrix (Structural grasses weaving through remaining blocks)
+    for (let y = 0; y < length; y++) {
+      for (let x = 0; x < width; x++) {
+        if (!structuralMask[y][x]) {
+          // Select continuous local matrix grasses based on environmental variables
+          const grassName = isRainGarden ? "Fox Sedge" : isWoodland ? "Bottlebrush Grass" : "Prairie Dropseed";
+          const grassSci = isRainGarden ? "Carex vulpinoidea" : isWoodland ? "Elymus hystrix" : "Sporobolus heterolepis";
 
-    for (let x = 0; x < width; x += 2) {
-      for (let y = 0; y < length; y += 2) {
-        grid.push({
-          x, y, plant_id: null,
-          moisture: 0.5, fertility: 0.5, shade: 0.2, stability: 0
+          matrix[y][x] = {
+            zone: 'MATRIX_GRASS',
+            scientific_name: grassSci,
+            common_name: `${grassName} (Matrix)`,
+            type: 'grass'
+          };
+        }
+      }
+    }
+
+    // Reformat coordinate structure block maps into client payload
+    const formattedCells = [];
+    for (let y = 0; y < length; y++) {
+      for (let x = 0; x < width; x++) {
+        const targetCell = matrix[y][x];
+        formattedCells.push({
+          x: x,
+          y: y,
+          zone: targetCell.zone === 'MATRIX_GRASS' ? 'FILL' : targetCell.zone, // Maintain legacy frontend compatibility mapping
+          plant_id: targetCell.zone,
+          common_name: targetCell.common_name,
+          scientific_name: targetCell.scientific_name
         });
       }
     }
 
-    plants.forEach((p, i) => {
-      const idx = (i * 7) % grid.length;
-      grid[idx].plant_id = p.id;
-    });
-
-    // 🔒 STABILIZATION: Lock execution parameters if flag validation evaluates true
-    const targetTicksCount = strictMode === true ? 4 : 4; 
-
-    for (let t = 0; t < targetTicksCount; t++) {
-      for (const cell of grid) {
-        if (!cell.plant_id) continue;
-
-        const plant = plants.find(p => p.id === cell.plant_id);
-        if (!plant) continue;
-
-        for (const other of grid) {
-          const dx = Math.abs(other.x - cell.x);
-          const dy = Math.abs(other.y - cell.y);
-          const dist = dx + dy;
-
-          if (dist > plant.interaction_radius * 2) continue;
-
-          other.moisture += plant.moisture_mod;
-          other.shade += plant.shade_mod;
-          other.stability += 0.02;
-        }
-      }
-
-      for (const c of grid) {
-        c.moisture = this.clamp(c.moisture);
-        c.shade = this.clamp(c.shade);
-        c.stability = this.clamp(c.stability);
-      }
-    }
-
-    return grid;
-  }
-
-  private toGridCells(grid: CellState[]): GridCell[] {
-    return grid.map(c => ({
-      x: c.x,
-      y: c.y,
-      plant_id: c.plant_id || "empty",
-      zone: c.stability > 0.6 ? "center" : c.x === 0 || c.y === 0 ? "edge" : "fill"
-    }));
-  }
-
-  private clamp(v: number): number {
-    return Math.max(0, Math.min(1, v));
+    return {
+      status: "success",
+      message: "Landscape grid constraints initialized successfully.",
+      timestamp: new Date().toISOString(),
+      grid_layout: {
+        width: width,
+        length: length,
+        density: density,
+        cells: formattedCells
+      },
+      received: payload
+    };
   }
 }
-
