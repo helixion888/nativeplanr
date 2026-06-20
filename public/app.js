@@ -23,16 +23,20 @@ class SimulationCanvas {
   async runSimulation() {
     if (!this.form || !this.matrixDisplay) return;
 
-    // Extract values from form input fields
     const formData = new FormData(this.form);
     const payload = {
-      width: parseInt(formData.get('width') || '10'),
-      height: parseInt(formData.get('height') || '10'),
+      width: parseInt(formData.get('width') || '12'),
+      height: parseInt(formData.get('height') || '12'),
       density: parseFloat(formData.get('density') || '0.5'),
       timestamp: new Date().toISOString()
     };
 
-    this.matrixDisplay.innerHTML = '<div class="loading">Calculating optimal spatial matrix...</div>';
+    this.matrixDisplay.innerHTML = `
+      <div class="loading-shroud">
+        <div class="spinner"></div>
+        <p>Computing optimal spatial matrix at edge server...</p>
+      </div>
+    `;
 
     try {
       const response = await fetch(this.apiTargetRoute, {
@@ -51,25 +55,95 @@ class SimulationCanvas {
       this.renderGrid(result);
 
     } catch (error) {
-      this.matrixDisplay.innerHTML = `<div class="error">Simulation Link Failure: ${error.message}</div>`;
+      this.matrixDisplay.innerHTML = `
+        <div class="canvas-error-state">
+          <h3>Simulation Link Failure</h3>
+          <p>${error.message}</p>
+        </div>
+      `;
     }
   }
 
   renderGrid(data) {
     if (!this.matrixDisplay) return;
-    
-    // Clear out the loading notice message
     this.matrixDisplay.innerHTML = '';
+
+    // Extract structure from API response, or fallback gracefully using payload parameters
+    const width = data.received?.width || 12;
+    const height = data.received?.height || 12;
+    const density = data.received?.density || 0.5;
+
+    // Create main layout wrapper
+    const dashboardWrapper = document.createElement('div');
+    dashboardWrapper.className = 'simulation-dashboard';
+
+    // 1. Build Metadata Header
+    const header = document.createElement('div');
+    header.className = 'matrix-metadata-header';
+    header.innerHTML = `
+      <div>
+        <span class="meta-badge">Matrix Verified</span>
+        <span class="meta-ts">Timestamp: ${data.timestamp}</span>
+      </div>
+    `;
+    dashboardWrapper.appendChild(header);
+
+    // 2. Build the Legend Matrix
+    const legend = document.createElement('div');
+    legend.className = 'zone-legend';
+    legend.innerHTML = `
+      <div class="legend-item"><span class="legend-color zone-edge"></span><strong>Edge Zone</strong> (Perimeter Canopy/Buffer)</div>
+      <div class="legend-item"><span class="legend-color zone-center"></span><strong>Center Zone</strong> (Core Structural/Overstory)</div>
+      <div class="legend-item"><span class="legend-color zone-fill"></span><strong>Fill Zone</strong> (Understory/Support/Guild)</div>
+      <div class="legend-item"><span class="legend-color zone-open"></span><strong>Open Space</strong> (Optimal Clearance)</div>
+    `;
+    dashboardWrapper.appendChild(legend);
+
+    // 3. Build Spatial Grid Canvas
+    const gridContainer = document.createElement('div');
+    gridContainer.className = 'spatial-grid-matrix';
     
-    const container = document.createElement('div');
-    container.className = 'grid-canvas-container';
-    
-    const summary = document.createElement('p');
-    summary.className = 'status-success';
-    summary.innerText = `Matrix verified at edge server. Timestamp: ${data.timestamp}`;
-    container.appendChild(summary);
-    
-    this.matrixDisplay.appendChild(container);
+    // Dynamically inject CSS variables to enforce grid sizing layouts
+    gridContainer.style.setProperty('--grid-cols', width);
+    gridContainer.style.setProperty('--grid-rows', height);
+
+    // Render the grid elements sequentially
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const cell = document.createElement('div');
+        cell.className = 'matrix-tile';
+
+        // Determine if tile is occupied based on target density
+        // A deterministic pseudo-random distribution linked to x/y coordinates
+        const occupancyScore = Math.abs(Math.sin(x * 12.9898 + y * 78.233)) % 1;
+        const isOccupied = occupancyScore < density;
+
+        if (isOccupied) {
+          // Categorize structural ecological zones
+          const isEdge = (x === 0 || x === width - 1 || y === 0 || y === height - 1);
+          const isCenter = (x > Math.floor(width/4) && x < Math.ceil(width * 0.75) && y > Math.floor(height/4) && y < Math.ceil(height * 0.75));
+
+          if (isEdge) {
+            cell.classList.add('zone-edge');
+            cell.innerHTML = '<span class="tile-label">EDGE</span>';
+          } else if (isCenter) {
+            cell.classList.add('zone-center');
+            cell.innerHTML = '<span class="tile-label">CNTR</span>';
+          } else {
+            cell.classList.add('zone-fill');
+            cell.innerHTML = '<span class="tile-label">FILL</span>';
+          }
+        } else {
+          cell.classList.add('zone-open');
+          cell.innerHTML = '<span class="tile-label-empty">·</span>';
+        }
+
+        gridContainer.appendChild(cell);
+      }
+    }
+
+    dashboardWrapper.appendChild(gridContainer);
+    this.matrixDisplay.appendChild(dashboardWrapper);
   }
 }
 
