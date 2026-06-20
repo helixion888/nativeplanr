@@ -10,6 +10,25 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
   
   if (!plotWidth || !plotLength || plotWidth <= 0 || plotLength <= 0) {
     displayContainer.innerHTML = `
+    // ==========================================================================
+  // RUNTIME TELEMETRY DIAGNOSTICS INJECTION
+  // ==========================================================================
+  const backendCells = apiResponse?.grid_layout?.cells || [];
+  const uniquePlantIds = [...new Set(backendCells.map(c => c.common_name))];
+  const diagnosticSnippet = backendCells.slice(0, 5);
+
+  const debugPanel = document.createElement('div');
+  debugPanel.style.cssText = 'background:#faf0e6; border:2px dashed #d69e2e; padding:1rem; font-family:monospace; font-size:0.8rem; margin-bottom:1.5rem; color:#2c2520; border-radius:4px;';
+  debugPanel.innerHTML = `
+    <strong>[TELEMETRY PIPELINE DIAGNOSTICS]</strong><br>
+    • Source Authentication Label: <span style="color:#2e5c3e;font-weight:bold;">${backendCells.length > 0 ? "Backend layout received successfully." : "FALLBACK CAUGHT: Frontend is generating layout locally."}</span><br>
+    • Total Grid Cells Detected in Wire: <strong>${backendCells.length}</strong><br>
+    • Unique Plant Varieties in Payload: <strong>${uniquePlantIds.length}</strong> (${uniquePlantIds.join(', ') || 'None'})<br>
+    • Raw Matrix Sample Data (First 5 Cells):
+    <pre style="background:#fbf9f5; padding:0.5rem; margin-top:0.5rem; overflow:auto; border:1px solid #dfdacb;">${JSON.stringify(diagnosticSnippet, null, 2)}</pre>
+  `;
+  displayContainer.appendChild(debugPanel);
+  // ==========================================================================
       <div class="canvas-error-state">
         <h3>Ecosystem Design Matrix Unavailable</h3>
         <p>The system was unable to establish spatial boundary vectors.</p>
