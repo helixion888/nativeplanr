@@ -138,11 +138,13 @@ window.renderBotanicalGrid = function(canvasInstance, apiResponse, siteContext) 
     const currentY = cellData.y;
     const isPathRow = (currentY === Math.floor(plotLength / 2));
 
-    if (globalPathStatus && isPathRow) {
+  if (globalPathStatus && isPathRow) {
+      // Map and extract clean path naming strings cleanly
+      const humanPathName = pathTypeMap[siteContext.pathwayChoice] || 'Pathway';
       tile.classList.add(`path-style-${siteContext.pathwayChoice}`);
       tile.innerHTML = `
         <span class="tile-icon-element">🪵</span>
-        <span class="tile-label">PATH</span>
+        <span class="tile-label">${humanPathName.toUpperCase()}</span>
       `;
       pathCellCount++;
     } else {
