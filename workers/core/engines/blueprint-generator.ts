@@ -15,7 +15,12 @@ class BlueprintGenerator {
       soil_type: 'rich-loam'
     };
 
-    const gardenType = ctx.garden_type || 'pollinator';
+    const gardenType =
+  ctx.garden_type ||
+  ctx.gardenType ||
+  ctx.site_context?.garden_type ||
+  ctx.site_context?.gardenType ||
+  'pollinator';
     const totalCells = width * length;
 
     // ==========================================
