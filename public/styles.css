@@ -1,358 +1,261 @@
 /* ==========================================================================
-   NATIVEPLANR BOTANICAL STYLING SYSTEM
-   Inspired by Midwestern Prairie Field Manuals & Landscape Architecture Prints
+   1. CORE VARIABLES & BRIGHT ECOLOGICAL PALETTE
    ========================================================================== */
+:root {
+  --bg-parchment: #fdfaf4;
+  --bg-sidebar: #f5efe2;
+  --text-dark: #2c2520;
+  --text-muted: #6e6359;
+  --border-color: #dfdacb;
+  
+  /* Ecological Botanical Accents */
+  --prairie-green: #2e5c3e;
+  --sage-green: #7fa685;
+  --warm-soil: #8c6239;
+  --sky-blue: #70a1b5;
+  --coneflower-purple: #9c6c9a;
+  --blazing-star: #8850a1;
+  --milkweed-leaf: #557a46;
+  --pathway-woodchip: #c2a679;
+}
 
-/* 1. Global Reset & Base Canvas Environment */
+/* Base Reset & Typography */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  background-color: #fbf9f5; /* Warm Antique Parchment Paper */
-  color: #2c2520; /* Deep Charcoal Wood Bark */
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-parchment);
+  color: var(--text-dark);
   line-height: 1.5;
-  padding: 1.5rem;
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden; /* Prevent page-breaking horizontal shifts */
-}
-
-/* Base Document Layout Constraints */
-.app-container {
-  max-width: 960px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* Traditional Botanical Editorial Header */
-.botanical-header {
-  text-align: center;
-  padding: 1rem 0;
-  border-bottom: 2px solid #e2dbcd;
-  margin-bottom: 0.5rem;
-}
-
-.site-title {
-  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #1e3f29; /* Deep Prairie Canopy Green */
-  margin: 0 0 0.25rem 0;
-  letter-spacing: -0.02em;
-}
-
-.site-tagline {
-  font-family: Georgia, serif;
-  font-style: italic;
-  font-size: 1.05rem;
-  color: #635345; /* Soft Muted Walnut */
-  margin: 0;
+  overflow-x: hidden;
 }
 
 /* ==========================================================================
-   FORM & INPUTS FRAMEWORK (TOUCH-FRIENDLY & PRINT-INSPIRED)
+   2. APPLICATION LAYOUT MESH (WORKSPACE ARCHITECTURE)
    ========================================================================== */
-.form-container {
-  background-color: #f4f0e6; /* Soft Seedling Paper Card */
-  border: 1px solid #dfdacb;
-  border-radius: 6px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(44, 37, 32, 0.04);
-}
-
-.parameter-form {
+#app-workspace-container {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  min-height: 100vh;
 }
 
-.form-group {
+/* Responsive Desktop Workspace Splits */
+@media (min-width: 992px) {
+  #app-workspace-container {
+    flex-direction: row;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .workspace-sidebar {
+    width: 420px;
+    min-width: 360px;
+    max-width: 440px;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 2px solid var(--border-color);
+    position: sticky;
+    top: 0;
+  }
+
+  .workspace-canvas-area {
+    flex: 1;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: #faf6ec;
+  }
+}
+
+/* ==========================================================================
+   3. SIDEBAR BRANDING & INTENSIVE INTAKES DESIGN
+   ========================================================================== */
+.workspace-sidebar {
+  background-color: var(--bg-sidebar);
+  padding: 1.75rem;
+}
+
+.sidebar-branding {
+  margin-bottom: 1.5rem;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.sidebar-branding h1 {
+  font-size: 1.8rem;
+  color: var(--prairie-green);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.sidebar-branding .tagline {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+/* Comprehensive Form Elements Layout */
+.sidebar-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-element {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  width: 100%;
 }
 
-.form-group label {
-  font-size: 0.9rem;
+.form-element label {
+  font-size: 0.8rem;
   font-weight: 700;
-  color: #1e3f29;
-  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--text-dark);
+  letter-spacing: 0.5px;
 }
 
-.optional-label {
-  font-weight: 400;
-  font-style: italic;
-  color: #7a6e62;
-}
-
-/* Accessible Select and Field Boxes */
-.parameter-form input, 
-.parameter-form select {
-  background-color: #fbf9f5;
-  color: #2c2520;
-  border: 1px solid #cfc4b2;
-  border-radius: 4px;
-  padding: 0.7rem 0.8rem;
-  font-size: 1rem;
-  font-family: inherit;
+.form-element select,
+.form-element input[type="text"],
+.form-element input[type="number"] {
   width: 100%;
-  box-sizing: border-box;
-  appearance: none; /* Modern style adjustments */
-  -webkit-appearance: none;
+  padding: 0.75rem;
+  background-color: var(--bg-parchment);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
 }
 
-/* Custom drop-down chevron injection */
-.parameter-form select {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231e3f29' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 16px;
-  padding-right: 2.5rem;
-}
-
-.parameter-form input:focus,
-.parameter-form select:focus {
-  border-color: #558766; /* Sage boundary accent highlight */
+.form-element select:focus,
+.form-element input:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(85, 135, 102, 0.15);
+  border-color: var(--prairie-green);
+  box-shadow: 0 0 0 3px rgba(46, 92, 62, 0.15);
 }
 
-/* Grid Dimension Inline Selector Rows */
-.dimensions-row {
+.dimensional-row-group {
   display: flex;
   gap: 1rem;
-  width: 100%;
 }
 
-.form-group.compact {
+.dimensional-row-group .compact {
   flex: 1;
 }
 
-/* Landscape Placement Action Submission Buttons */
-.action-button {
-  background-color: #2e5c3e; /* Rich Forest Moss */
-  color: #fbf9f5;
-  border: none;
-  border-radius: 4px;
-  padding: 0.9rem 1.5rem;
-  font-size: 1.05rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
+/* Bold Generate Trigger Button */
+.action-submit-btn {
   width: 100%;
-  box-shadow: 0 2px 4px rgba(46, 92, 62, 0.1);
+  padding: 1rem;
+  background-color: var(--prairie-green);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 4px 6px rgba(46, 92, 62, 0.2);
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-.action-button:hover {
-  background-color: #1c3c27;
+.action-submit-btn:hover {
+  background-color: #23472f;
+}
+
+.action-submit-btn:active {
+  transform: scale(0.98);
 }
 
 /* ==========================================================================
-   SIMULATION OUTPUT OVERLAYS & RESULTS STYLES
+   4. TELEMETRY OUTPUT CARD & VIBRANT LEGEND MODULES
    ========================================================================== */
-.simulation-dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  width: 100%;
-}
-
-/* 2. Analytical Site Context Summary Panel Box */
 .botanical-summary-panel {
-  background-color: #faf6ed;
-  border-left: 4px solid #558766; /* Elegant Sage Leaf structural bar */
-  border-top: 1px solid #e6decb;
-  border-right: 1px solid #e6decb;
-  border-bottom: 1px solid #e6decb;
-  border-radius: 0 4px 4px 0;
+  background-color: var(--bg-parchment);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
   padding: 1.25rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
 }
 
 .summary-headline {
-  font-family: Georgia, serif;
-  font-size: 1.15rem;
-  color: #1e3f29;
-  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
+  color: var(--warm-soil);
+  margin-bottom: 0.75rem;
+  font-weight: 700;
 }
 
 .summary-details-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.6rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   font-size: 0.85rem;
-  border-bottom: 1px dashed #dcd3be;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.75rem;
   margin-bottom: 0.75rem;
 }
 
-.summary-item strong {
-  color: #635345;
-  display: block;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.02em;
-}
-
-.summary-item span {
-  font-weight: 600;
-  color: #2c2520;
+.summary-item {
+  display: flex;
+  justify-content: space-between;
 }
 
 .summary-educational-text {
-  font-size: 0.9rem;
-  color: #4a3f35;
-  margin: 0;
-  line-height: 1.5;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.4;
 }
 
-/* 3. Section Headers */
-.blueprint-section-header {
-  margin-top: 0.5rem;
-}
-
-.panel-headline {
-  font-family: Georgia, Cambria, serif;
-  font-size: 1.6rem;
-  color: #1e3f29;
-  margin: 0;
-}
-
-/* 4. Map Scale Viewport Controls Panel Bar */
+/* Viewport Scale Actions Widget Group */
 .viewport-controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #eaddcd; /* Soft Mulch Base */
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  border: 1px solid #cfc4b2;
+  background: var(--bg-parchment);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem;
+  border-radius: 6px;
+  margin-top: 1rem;
 }
 
 .zoom-btn {
-  background-color: #fbf9f5;
-  color: #2c2520;
-  border: 1px solid #bfae97;
-  border-radius: 4px;
   padding: 0.4rem 0.8rem;
-  font-size: 0.85rem;
-  font-weight: 700;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.1s ease;
+  font-size: 0.8rem;
+  font-weight: bold;
 }
 
 .zoom-btn:hover {
-  background-color: #f4f0e6;
+  background: #fdfaf4;
+  border-color: var(--text-muted);
 }
 
 #zoom-percentage-label {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #4a3f35;
-  font-family: Georgia, serif;
-  font-style: italic;
+  font-size: 0.8rem;
+  font-family: monospace;
+  font-weight: bold;
 }
 
-/* 5. Mobile-Safe Panning Enclosure Viewport Mechanics */
-.mobile-viewport-container {
-  width: 100%;
-  overflow: auto; /* Activates natural native fluid swiping on mobile touchscreens */
-  background-color: #e6dfd3; /* Textured earthen bed boundary matrix background */
-  border: 1px solid #cfc4b2;
-  border-radius: 6px;
-  padding: 1.25rem;
-  box-sizing: border-box;
-  touch-action: pan-x pan-y;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* 6. Dynamic Grid Resolution Canvas Blueprint Matrix */
-.spatial-grid-matrix {
-  display: grid;
-  /* Locks minimum column boundaries to prevent cell crushing on mobile */
-  grid-template-columns: repeat(var(--grid-cols, 12), minmax(64px, 1fr));
-  grid-template-rows: repeat(var(--grid-rows, 12), minmax(64px, 1fr));
-  gap: 5px;
-  width: max-content;
-  margin: 0 auto;
-  transform-origin: top center;
-  transition: transform 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
-}
-
-/* 7. Botanical Tile Graphics Structure */
-.matrix-tile {
+/* Clean Integrated Legend Design Block */
+.zone-legend {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  box-sizing: border-box;
-  padding: 4px;
-  text-align: center;
-  user-select: none;
-  box-shadow: inset 0 -1px 2px rgba(0,0,0,0.03), 0 1px 2px rgba(44,37,32,0.02);
-}
-
-.tile-icon-element {
-  font-size: 1.3rem;
-  margin-bottom: 2px;
-  line-height: 1;
-}
-
-.tile-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  line-height: 1.1;
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  word-wrap: break-word;
-  max-width: 100%;
-}
-
-/* 8. Authentic Habitat Color System Palette Rulesets */
-.zone-edge {
-  background-color: #e9f5ed; /* Milkweed Leaf Green */
-  color: #193822;
-  border: 1px solid #8cbfa0;
-}
-
-.zone-center {
-  background-color: #f5edf8; /* Blazing Star Violet / Purple */
-  color: #441f52;
-  border: 1px solid #caa3d6;
-}
-
-.zone-fill {
-  background-color: #fef8e7; /* Coneflower / Muted Prairie Gold */
-  color: #5c4314;
-  border: 1px solid #e0c282;
-}
-
-.zone-open {
-  background-color: #f5efe4; /* Exposed Clear Soil Patch */
-  color: #8c7e6e;
-  border: 1px dashed #cfc4b2;
-}
-
-/* 9. Front-End Pathway Texture Masks Overrides */
-.path-style-grass { background-color: #d1e7d6; color: #1e3f29; border: 1px dashed #689f7d; }
-.path-style-woodchips { background-color: #ebdcd0; color: #5c4314; border: 1px dashed #a07855; }
-.path-style-gravel { background-color: #e2e4e6; color: #43464a; border: 1px dashed #9aa0a6; }
-.path-style-pavers { background-color: #cfd2d6; color: #202124; border: 1px solid #70757a; }
-.path-style-dirt { background-color: #dfcebe; color: #4e3621; border: 1px dashed #8b5a2b; }
-
-/* 10. Clear Landscape Index Legends Matrix Layout */
-.zone-legend {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 0.8rem;
-  background-color: #fbf9f5;
-  padding: 1.25rem;
-  border-radius: 6px;
-  border: 1px solid #dfdacb;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.01);
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px dashed var(--border-color);
 }
 
 .legend-item {
@@ -360,71 +263,147 @@ body {
   align-items: center;
   gap: 0.75rem;
   font-size: 0.85rem;
-  color: #4a3f35;
 }
 
 .legend-color {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 4px;
-  display: inline-block;
   flex-shrink: 0;
-}
-
-/* 11. Empty/Error/Loading Blueprint Placeholders States */
-.canvas-placeholder-text {
-  font-family: Georgia, serif;
-  font-style: italic;
-  font-size: 1.05rem;
-  color: #736657;
-  text-align: center;
-  padding: 4rem 2rem;
-  line-height: 1.6;
-}
-
-.loading-shroud {
-  font-family: Georgia, serif;
-  font-style: italic;
-  color: #1e3f29;
-  text-align: center;
-  padding: 5rem 2rem;
-  animation: visualPulse 1.8s infinite ease-in-out;
-}
-
-.canvas-error-state {
-  border: 1px dashed #c53030;
-  background-color: #fff5f5;
-  color: #9b2c2c;
-  padding: 2rem;
-  border-radius: 4px;
-  text-align: center;
-}
-
-@keyframes visualPulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1.0; }
-  100% { opacity: 0.6; }
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 /* ==========================================================================
-   RESPONSIVE LAYOUT UPGRADES (MEDIA QUERY BREAKPOINTS)
+   5. RIGHT CANVAS: INTERACTIVE LANDSCAPE PLATFORM BOARD
    ========================================================================== */
-@media (min-width: 640px) {
-  body {
-    padding: 2.5rem 2rem;
-  }
-  
-  .parameter-form {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.2rem;
-  }
-  
-  .dimensions-row {
-    grid-column: span 2;
-  }
-  
-  .form-actions {
-    grid-column: span 2;
-  }
+.workspace-canvas-area {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+#canvas-rendering-target-wrapper {
+  width: 100%;
+  max-width: 900px;
+}
+
+.blueprint-section-header {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.panel-headline {
+  font-size: 1.6rem;
+  color: var(--prairie-green);
+  font-weight: 700;
+}
+
+/* Mobile Scrollable Viewport Frame Box */
+.mobile-viewport-container {
+  width: 100%;
+  overflow: auto;
+  background-color: var(--bg-parchment);
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: inset 0 4px 12px rgba(0,0,0,0.02);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 450px;
+}
+
+/* ==========================================================================
+   6. GRAPHIC DESIGN MATRIX CANVAS TILES MAP ENGINE
+   ========================================================================== */
+.spatial-grid-matrix {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols, 12), minmax(65px, 1fr));
+  grid-template-rows: repeat(var(--grid-rows, 12), minmax(65px, 1fr));
+  gap: 4px;
+  transform-origin: center center;
+  transition: transform 0.2s cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+.matrix-tile {
+  background-color: white;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  transition: all 0.15s ease;
+}
+
+.matrix-tile:hover {
+  transform: translateY(-2px);
+  box-sizing: border-box;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+}
+
+.tile-icon-element {
+  font-size: 1.3rem;
+  margin-bottom: 0.15rem;
+}
+
+.tile-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-dark);
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   7. SPECIFIC GRAPHIC CORE STRATIFICATION CLASSES
+   ========================================================================== */
+.zone-center { background-color: #ebd7ec !important; border-color: var(--coneflower-purple) !important; } /* Coneflower Purple Tint */
+.zone-fill   { background-color: #f1e4fa !important; border-color: var(--blazing-star) !important; }       /* Blazing Star Tint */
+.zone-edge   { background-color: #e2edd5 !important; border-color: var(--milkweed-leaf) !important; }      /* Milkweed Green Tint */
+.zone-open   { background-color: #e6f2eb !important; border-color: var(--sage-green) !important; }         /* Grass Sedge Open Tint */
+
+/* Infrastructure Footprints Overlays styling mapping */
+.path-style-grass     { background-color: #cbdccb !important; border-color: #9cbda0 !important; font-weight: bold; }
+.path-style-woodchips { background-color: #eccfa2 !important; border-color: #d1ab70 !important; font-weight: bold; }
+.path-style-gravel    { background-color: #e0ded9 !important; border-color: #b8b6b0 !important; font-weight: bold; }
+.path-style-pavers    { background-color: #d6cbc7 !important; border-color: #ad9a94 !important; font-weight: bold; }
+.path-style-dirt      { background-color: #d7beaa !important; border-color: #a48268 !important; font-weight: bold; }
+
+/* Empty States Prompts Graphics Formatting */
+.canvas-empty-state, .canvas-error-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+}
+
+.prompt-icon-graphic {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.canvas-empty-state h2 {
+  font-size: 1.4rem;
+  color: var(--prairie-green);
+  margin-bottom: 0.5rem;
+}
+
+.canvas-empty-state p {
+  font-size: 0.95rem;
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.5;
 }
