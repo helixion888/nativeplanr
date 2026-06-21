@@ -1,6 +1,6 @@
 /**
  * NativePlanr Vanilla JavaScript Edge Engine
- * Core Layout, Rigid Allocation Caps & Variety Expansion Pipeline
+ * Core Layout, Rigid Allocation Caps & Multi-Species Interlocking Drifts Pipeline
  */
 class BlueprintGenerator {
   static generate(payload) {
@@ -36,26 +36,23 @@ class BlueprintGenerator {
 
     // Dynamic Scale Tiers
     let scaleTier = 'medium';
-    let targetDriftSize = [5, 12];
+    let targetDriftSize = [4, 8];
     if (totalCells <= 16) {
       scaleTier = 'small';
-      targetDriftSize = [1, 2]; // Force micro-drifts for small grids to maintain diversity
+      targetDriftSize = [1, 2]; // Force single/double cell units for micro plots to guarantee variety mix
     } else if (totalCells <= 100) {
       scaleTier = 'medium-small';
-      targetDriftSize = [3, 5];
+      targetDriftSize = [2, 4]; // Restrict maximum individual cluster size to prevent species monopoly
     } else if (totalCells >= 400) {
       scaleTier = 'large';
-      targetDriftSize = [12, 30];
+      targetDriftSize = [12, 25];
     }
 
     const matrix = Array(length).fill(null).map(() => Array(width).fill(null));
     const structuralMask = Array(length).fill(null).map(() => Array(width).fill(false));
 
     const isWoodland = gardenType === 'woodland';
-    const isMeadow = gardenType === 'meadow';
     const isRainGarden = gardenType === 'rain-garden';
-    const isDeerResistant = gardenType === 'deer-resistant';
-    const isLowMaint = gardenType === 'low-maintenance';
     const isPartShade = gardenType === 'part-shade';
 
     // ==========================================
@@ -64,7 +61,6 @@ class BlueprintGenerator {
     const hasPath = ctx.pathway_choice && ctx.pathway_choice !== 'none';
     let pathCellCount = 0;
 
-    // Map internal code tokens directly to readable user labels
     const pathLabelMap = {
       'grass': 'Grass Path',
       'woodchips': 'Woodchip Path',
@@ -94,7 +90,7 @@ class BlueprintGenerator {
             matrix[y][x] = {
               zone: 'PATH',
               scientific_name: 'Infrastructure Layer',
-              common_name: publicPathLabel, // FIXED: Removed "Pathway Data Node"
+              common_name: publicPathLabel,
               type: 'path'
             };
             structuralMask[y][x] = true;
@@ -150,7 +146,6 @@ class BlueprintGenerator {
         { name: "Wild Columbine", sci: "Aquilegia canadensis" }
       ];
     } else {
-      // Pollinator, Meadow, Low-Maint, Deer-Resistant baseline pools
       pool = [
         { name: "Purple Coneflower", sci: "Echinacea purpurea" },
         { name: "Rough Blazing Star", sci: "Liatris aspera" },
@@ -160,57 +155,63 @@ class BlueprintGenerator {
       ];
     }
 
-    // DATASET LIMITATION SAFEGUARD CLAUSE
     const datasetNotice = pool.length < 5 ? "Notice: Limited local species array constraint active." : "Full palette optimized.";
 
     // ==========================================
-    // 5. ALLOCATION QUOTA LOOP (Continuous Forbs)
+    // 5. ENFORCED INTERLOCKING PALETTE ALTERNATION
     // ==========================================
     let placedForbCells = 0;
     let seedIndex = 0;
-    // Target count claims all space minus path, shrubs, and maximum allowed grass cap
     const targetMinimumForbCells = totalCells - pathCellCount - placedShrubCells - maxGrassAllowedCells;
 
-    while ((placedForbCells < targetMinimumForbCells || structuralMask.flat().includes(false)) && seedIndex < 300) {
-      const seedY = Math.floor((Math.abs(Math.sin(seedIndex * 83.3 + 29.1)) * 1000) % length);
-      const seedX = Math.floor((Math.abs(Math.cos(seedIndex * 47.1 + 61.4)) * 1000) % width);
+    // Track species assignment counts to prevent single-species domination caps
+    const speciesPlacementTracker = {};
+    pool.forEach(p => speciesPlacementTracker[p.name] = 0);
+
+    while ((placedForbCells < targetMinimumForbCells || structuralMask.flat().includes(false)) && seedIndex < 400) {
+      const seedY = Math.floor((Math.abs(Math.sin(seedIndex * 91.7 + 37.2)) * 1000) % length);
+      const seedX = Math.floor((Math.abs(Math.cos(seedIndex * 53.3 + 19.8)) * 1000) % width);
 
       if (structuralMask[seedY][seedX]) {
         seedIndex++;
         continue;
       }
 
-      // Rotate through species selection pool systematically to force max diversity
-      const speciesIndex = seedIndex % pool.length;
-      const chosenSpecies = pool[speciesIndex];
+      // FIXED: Rotate species selection step-by-step to prevent front-loaded array domination
+      const currentSpecies = pool[seedIndex % pool.length];
 
-      const baseRandomSize = targetDriftSize[0] + Math.floor((Math.abs(Math.sin(seedIndex * 11.2)) * 100) % (targetDriftSize[1] - targetDriftSize[0] + 1));
-      
-      // Enforce strict 40% single species caps on small plots
-      let allowedDriftLimit = baseRandomSize;
+      // Enforce strict 40% single-species ceiling on small/medium plots
       if (scaleTier === 'small' || scaleTier === 'medium-small') {
-        const maxSingleSpeciesCells = Math.max(2, Math.floor(0.4 * totalCells));
-        allowedDriftLimit = Math.min(baseRandomSize, maxSingleSpeciesCells);
+        const singleSpeciesMaxCount = Math.max(2, Math.floor(0.4 * totalCells));
+        if (speciesPlacementTracker[currentSpecies.name] >= singleSpeciesMaxCount) {
+          // Skip if this species already rules its allowed percentage area
+          seedIndex++;
+          continue;
+        }
       }
+
+      const baseRandomSize = targetDriftSize[0] + Math.floor((Math.abs(Math.sin(seedIndex * 14.7)) * 100) % (targetDriftSize[1] - targetDriftSize[0] + 1));
+      const driftSize = Math.min(baseRandomSize, targetMinimumForbCells - placedForbCells);
 
       const queue = [[seedY, seedX]];
       let currentDriftPlaced = 0;
       const visited = Array(length).fill(null).map(() => Array(width).fill(false));
       visited[seedY][seedX] = true;
 
-      while (queue.length > 0 && currentDriftPlaced < allowedDriftLimit) {
+      while (queue.length > 0 && currentDriftPlaced < driftSize) {
         const [cy, cx] = queue.shift();
 
         if (!structuralMask[cy][cx]) {
           matrix[cy][cx] = {
             zone: seedIndex % 3 === 0 ? 'CORE' : seedIndex % 3 === 1 ? 'EDGE' : 'FILL',
-            scientific_name: chosenSpecies.sci,
-            common_name: chosenSpecies.name,
+            scientific_name: currentSpecies.sci,
+            common_name: currentSpecies.name,
             type: 'flower'
           };
           structuralMask[cy][cx] = true;
           currentDriftPlaced++;
           placedForbCells++;
+          speciesPlacementTracker[currentSpecies.name]++;
 
           const neighbors = [[cy - 1, cx], [cy + 1, cx], [cy, cx - 1], [cy, cx + 1]];
           for (const [ny, nx] of neighbors) {
@@ -233,7 +234,6 @@ class BlueprintGenerator {
 
     for (let y = 0; y < length; y++) {
       for (let x = 0; x < width; x++) {
-        // Grass fills left over cells ONLY if we haven't breached the hard ceiling cap
         if (!structuralMask[y][x] && placedGrassCells < maxGrassAllowedCells) {
           matrix[y][x] = {
             zone: 'MATRIX_GRASS',
@@ -244,7 +244,7 @@ class BlueprintGenerator {
           structuralMask[y][x] = true;
           placedGrassCells++;
         } else if (!structuralMask[y][x]) {
-          // If grass limit is exhausted, emergency fill remainder with pool flowers
+          // Emergency variety distribution if grass cap is fully maxed out
           const backupFlower = pool[x % pool.length];
           matrix[y][x] = {
             zone: 'FILL',
@@ -258,7 +258,7 @@ class BlueprintGenerator {
       }
     }
 
-    // Compile legacy response structure mapping arrays
+    // Compile legacy wire array format
     const formattedCells = [];
     const uniquePlantsFound = new Set();
 
