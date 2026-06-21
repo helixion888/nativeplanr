@@ -30,16 +30,19 @@ class SimulationCanvas {
     const pathwayInput = document.getElementById('pathway');
     const soilInput = document.getElementById('soil');
 
-    const siteContext = {
-      state: stateInput ? stateInput.value : 'MI',
-      county: countyInput ? countyInput.value.trim() : '',
-      gardenType: gardenTypeInput ? gardenTypeInput.value : 'pollinator',
-      pathwayChoice: pathwayInput ? pathwayInput.value : 'none',
-      soilType: soilInput ? soilInput.value : 'rich-loam',
-      width: widthInput ? parseInt(widthInput.value, 10) : 12,
-      length: lengthInput ? parseInt(lengthInput.value, 10) : 12,
-      density: densityInput ? parseFloat(densityInput.value) : 0.5
-    };
+    // ... [existing data extraction code] ...
+const siteContext = {
+  state: document.getElementById("state-selection").value,
+  county: document.getElementById("county-input").value,
+  soil_type: document.getElementById("soil-type-selection").value,
+  
+  // TRANSMIT BOTH STRUCTURAL KEYS INTERCHANGEABLY
+  garden_type: document.getElementById("garden-type-selection").value,
+  gardenType: document.getElementById("garden-type-selection").value,
+  
+  pathway_choice: document.getElementById("pathway-selection").value
+};
+// ... [rest of data payload tracking fetch routines] ...
 
     console.log("1. Form UI Input State Gathered:", siteContext);
 
